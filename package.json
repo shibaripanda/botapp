@@ -1,0 +1,16 @@
+{
+  "name": "new",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "app": "concurrently \"(npm run start:dev --prefix screenBotback)\" \"(npm run dev --prefix screenBot)\" \"(npm run start --prefix screenBotFront)\"",
+    "upnpm": "npm i && cd screenBot && npm i && cd .. && cd screenBotback && npm i && cd .. && cd screenBotFront && npm i && cd ..",
+    "gitup": "git add . && git commit -m 'home' && git push origin main"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
