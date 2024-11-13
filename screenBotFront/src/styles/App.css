@@ -1,0 +1,17 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  margin-top: 0px;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  width: 98.5vw;
+}
+
+body {
+  background-color: rgb(236, 236, 236);
+  /* white-space: pre-wrap; */
+}
