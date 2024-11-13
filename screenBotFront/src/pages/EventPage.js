@@ -31,7 +31,7 @@ console.log('s')
 
   useEffect(() => {
     if(!sessionStorage.getItem('token')){
-      window.location.assign(fix.appLink)
+      window.location.assign(process.env.APPLINK)
     }
     else{
       const pipSocketListners = [

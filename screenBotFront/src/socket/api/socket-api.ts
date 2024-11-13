@@ -6,7 +6,7 @@ export class SocketApt {
     static socket: null | Socket = null
 
     static createConnections(): void {
-        this.socket = io(fix.serverAuthLink, {auth: {token: {'Authorization': 'Bearer ' + sessionStorage.getItem('token')}}})
+        this.socket = io(process.env.SERVERAUTHLINK, {auth: {token: {'Authorization': 'Bearer ' + sessionStorage.getItem('token')}}})
 
         this.socket.on('connect', () => {
             console.log('connect')
@@ -18,7 +18,7 @@ export class SocketApt {
 
         this.socket.on('exception', (data) => {
             console.log(data)
-            window.location.assign(fix.appLink!)
+            window.location.assign(process.env.APPLINK!)
         })
 
     }

@@ -4,15 +4,16 @@ import { useNavigate } from 'react-router-dom'
 import { fix } from '../fix/fix'
 
 export function TelegramVidget() {
+    console.log(process.env.BOTNAME)
     const navigate = useNavigate()
     return (
         <div>
             <LoginButton
-                botUsername={fix.botName}
+                botUsername={process.env.BOTNAME}
                 onAuthCallback={async (data) => {
                     return await axios({
                       method: 'POST',
-                      url: `${fix.serverLink}/auth/login`,
+                      url: `${process.env.SERVERLINK}/auth/login`,
                       data: data,
                       timeout: 10000
                     })

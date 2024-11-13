@@ -1,3 +1,4 @@
+// import 'dotenv/config'
 import React from 'react'
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { MantineProvider } from '@mantine/core'
