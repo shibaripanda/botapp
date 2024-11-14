@@ -30,7 +30,7 @@ export function BotEditPage() {
 
   useEffect(() => {
     if(!sessionStorage.getItem('token')){
-      window.location.assign(process.env.APPLINK)
+      window.location.assign(process.env.REACT_APP_BOTNAME)
     }
     else{
       const pipSocketListners = [
