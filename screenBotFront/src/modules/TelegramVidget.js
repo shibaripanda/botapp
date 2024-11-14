@@ -3,7 +3,6 @@ import axios from "axios"
 import { useNavigate } from 'react-router-dom'
 
 export function TelegramVidget() {
-    console.log(process.env.REACT_APP_BOTNAME)
     const navigate = useNavigate()
     return (
         <div>

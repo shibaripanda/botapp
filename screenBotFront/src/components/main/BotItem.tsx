@@ -2,7 +2,7 @@ import { Button, Paper, Text, TextInput, Grid } from '@mantine/core'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export function BotItem({bot, deleteBot, offBot, onBot}) {
+export function BotItem({bot, deleteBot, offBot, onBot, text, leng}) {
 
   const [deleteValue, setDeleteValue] = useState('')
   const navigate = useNavigate()
@@ -22,7 +22,7 @@ export function BotItem({bot, deleteBot, offBot, onBot}) {
         onClick={() => {
           offBot(bot._id)
         }}>
-          OFF
+          {text.off[leng]}
         </Button>
       )
     }
@@ -31,7 +31,7 @@ export function BotItem({bot, deleteBot, offBot, onBot}) {
       onClick={() => {
         onBot(bot._id)
       }}>
-          ON
+          {text.on[leng]}
       </Button>
     )
   }
@@ -76,7 +76,7 @@ export function BotItem({bot, deleteBot, offBot, onBot}) {
                     onClick={() => {
                       navigate(`/monit/${bot._id}/${bot.name} (@${bot.username})`)
                     }}>
-                    Monitor
+                    {text.monit[leng]}
                   </Button>
         </Grid.Col>
         <Grid.Col span={2.5}>
@@ -85,7 +85,7 @@ export function BotItem({bot, deleteBot, offBot, onBot}) {
                     onClick={() => {
                       navigate(`/content/${bot._id}/${bot.name} (@${bot.username})`)
                     }}>
-                    Content
+                    {text.content[leng]}
                   </Button>
         </Grid.Col>
         <Grid.Col span={2.5}>
@@ -95,7 +95,7 @@ export function BotItem({bot, deleteBot, offBot, onBot}) {
                     onClick={() => {
                       navigate(`/event/${bot._id}/${bot.name} (@${bot.username})`)
                     }}>
-                    Events
+                    {text.events[leng]}
                   </Button>
         </Grid.Col>
         <Grid.Col span={2.5}>
@@ -104,7 +104,7 @@ export function BotItem({bot, deleteBot, offBot, onBot}) {
                     onClick={() => {
                       navigate(`/botedit/${bot._id}`)
                     }}>
-                    Constructor
+                    {text.constr[leng]}
                   </Button>
         </Grid.Col>
       </Grid>
@@ -137,7 +137,7 @@ export function BotItem({bot, deleteBot, offBot, onBot}) {
                     setDeleteValue('')
                   }}
                   >
-                    Delete
+                    {text.delete[leng]}
                   </Button>
         </Grid.Col>
       </Grid>

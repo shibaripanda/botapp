@@ -1,16 +1,21 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { lengs } from './modules/lenguages/allText';
 
-@Controller()
+@Controller('/app')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private appService: AppService) {}
 
-  // async onApplicationBootstrap() {
-  // }
+  @Get('/text')
+  getText(){
+    console.log('text')
+    return this.appService.getText()
+  }
 
-  // @Get('/')
-  // getHello(): string {
-  //   console.log('sdsd')
-  //   return 'this.appService.getHello()';
-  // }
+  @Get('/avleng')
+  getAvleng(): any{
+    console.log('avleng')
+    return lengs
+  }
+
 }

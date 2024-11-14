@@ -4,16 +4,17 @@ import classes from './HelloScreen.css';
 import React from 'react';
 import { TelegramVidget } from '../../modules/TelegramVidget';
 
-export function HelloScreen() {
+export function HelloScreen(props) {
+  console.log(props)
   return (
     <Container size="md">
       <div className={classes.inner}>
         <div className={classes.content}>
           <Title className={classes.title}>
-            A <span className={classes.highlight}>Simple</span> Telegram Bot <br /> Constructor App
+            {props.text.constructor[props.leng]}
           </Title>
           <Text c="dimmed" mt="md">
-          Create your own telegram bot quickly and with huge possibilities
+            {props.text.createBot[props.leng]}
           </Text>
 
           <List
@@ -26,7 +27,7 @@ export function HelloScreen() {
               </ThemeIcon>
             }
           >
-            <List.Item>
+            {/* <List.Item>
               <b>TypeScript based</b> – build type safe applications, all components and hooks
               export types
             </List.Item>
@@ -37,7 +38,7 @@ export function HelloScreen() {
             <List.Item>
               <b>No annoying focus ring</b> – focus ring will appear only when user navigates with
               keyboard
-            </List.Item>
+            </List.Item> */}
           </List>
 
           <Group mt={30}>

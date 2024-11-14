@@ -14,6 +14,8 @@ export function MainPage() {
 
   const [status, setStatus] = useState(false)
   const [bots, setBots] = useState(false)
+  const text = window.textBotApp
+  const leng = window.lengBotApp
 
   const reverseBots = async (data) => {
     setBots(await data.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)))
@@ -54,14 +56,14 @@ export function MainPage() {
   if(bots && status){
     return (
       <div style={{width: '55vmax', marginTop: '3vmax', marginBottom: '3vmax'}}>
-        <CreateNewBotForm createBot={createBot}/>
-        {bots.map((item, index) => <div key={index} style={{marginTop: '1vmax'}}><BotItem bot={item} deleteBot={deleteBot} onBot={onBot} offBot={offBot}/></div>)}
+        <CreateNewBotForm createBot={createBot} text={text} leng={leng}/>
+        {bots.map((item, index) => <div key={index} style={{marginTop: '1vmax'}}><BotItem text={text} leng={leng} bot={item} deleteBot={deleteBot} onBot={onBot} offBot={offBot}/></div>)}
       </div>
     )
   }
   else{
     return (
-      <div style={{marginTop: '5vmax'}}>Loading...</div>
+      <div style={{marginTop: '5vmax'}}>{text.loading[leng]}</div>
     )
   }
 

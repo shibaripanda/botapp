@@ -29,6 +29,7 @@
     "@nestjs/websockets": "^10.4.1",
     "@telegram-auth/server": "^1.0.4",
     "dotenv": "^16.4.5",
+    "openai": "^4.72.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.5",
