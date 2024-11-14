@@ -40,6 +40,7 @@ export function ConnectPage() {
     }
   }
   async function userSetLeng(leng) {
+    console.log(leng)
     window.lengBotApp = leng
     setLeng(leng)
   }

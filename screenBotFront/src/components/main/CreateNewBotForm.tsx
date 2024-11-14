@@ -1,15 +1,20 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Anchor, Button, Paper, TextInput } from '@mantine/core'
 import { SocketApt } from '../../socket/api/socket-api.ts'
 
 export function CreateNewBotForm(props) {
 
-    const link = <div>{props.text.createNewBot[props.leng]} <Anchor size='sm' href="https://t.me/BotFather" target="_blank">BotFather</Anchor></div>
+    let link = <div>{props.text.createNewBot[props.leng]} <Anchor size='sm' href="https://t.me/BotFather" target="_blank">BotFather</Anchor></div>
 
     const [value, setValue] = useState('')
     const [resStatus, setResStatus] = useState(link)
 
+    useMemo(() => {
+        setResStatus(link)
+    }, [link, setResStatus])
+
     SocketApt.socket?.on('createNewBot', (data) => {
+        console.log(data)
         setResStatus(data)
     })
 
@@ -27,7 +32,7 @@ export function CreateNewBotForm(props) {
             placeholder={props.text.token[props.leng]}
             value={value}
             onChange={(event) => {
-                setResStatus(link)
+                setResStatus(resStatus)
                 setValue(event.currentTarget.value)
             }}
             />

@@ -7,6 +7,8 @@ import { CreateNewBotForm } from '../components/main/CreateNewBotForm.tsx'
 import { BotItem } from '../components/main/BotItem.tsx'
 import { pipSendSocket } from '../socket/pipSendSocket.ts'
 import { pipGetSocket } from '../socket/pipGetSocket.ts'
+import axios from 'axios'
+import { LanguagePicker } from '../components/LanguagePicker/LanguagePicker.tsx'
 
 export function MainPage() {
   console.log('main')
@@ -14,8 +16,46 @@ export function MainPage() {
 
   const [status, setStatus] = useState(false)
   const [bots, setBots] = useState(false)
-  const text = window.textBotApp
-  const leng = window.lengBotApp
+
+  const [text, setText] = useState(window.textBotApp ? window.textBotApp : false)
+  const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : 'en')
+  const [avLeng, setAvLeng] = useState(false)
+
+  // const text = window.textBotApp
+  // const leng = window.lengBotApp
+
+  async function getText(){
+    const text = await axios({
+      method: 'GET',
+      url: `${process.env.REACT_APP_SERVERLINK}/app/text`,
+      timeout: 10000
+    })
+    window.textBotApp = text.data
+    setText(text.data)
+  }
+  async function userLenguage(){
+    const l = window.navigator.language.substring(0,2) ? window.navigator.language.substring(0,2) : 'en'
+    const avLengs = await axios({
+      method: 'GET',
+      url: `${process.env.REACT_APP_SERVERLINK}/app/avleng`,
+      timeout: 10000
+    })
+    setAvLeng(avLengs.data)
+    if(!avLengs.data.map(item => item.index).includes(l)){
+      window.lengBotApp = 'en'
+      setLeng('en')
+    }
+    else{
+      if(!window.lengBotApp){
+        window.lengBotApp = l
+        setLeng(l)
+      }
+    }
+  }
+  async function userSetLeng(leng) {
+    window.lengBotApp = leng
+    setLeng(leng)
+  }
 
   const reverseBots = async (data) => {
     setBots(await data.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)))
@@ -32,6 +72,10 @@ export function MainPage() {
       pipGetSocket(pipSocketListners)
       pipSendSocket('getMyBots')
       setStatus(true)
+      if(!window.textBotApp){
+        getText()
+        userLenguage()
+      }
     }
   }, [])
 
@@ -53,9 +97,12 @@ export function MainPage() {
   }
 
   
-  if(bots && status){
+  if(bots && status && text){
     return (
       <div style={{width: '55vmax', marginTop: '3vmax', marginBottom: '3vmax'}}>
+        <div style={{marginBottom: '1vmax'}}>
+          <LanguagePicker avLeng={avLeng} setLeng={userSetLeng} leng={leng}/>
+        </div>
         <CreateNewBotForm createBot={createBot} text={text} leng={leng}/>
         {bots.map((item, index) => <div key={index} style={{marginTop: '1vmax'}}><BotItem text={text} leng={leng} bot={item} deleteBot={deleteBot} onBot={onBot} offBot={offBot}/></div>)}
       </div>
@@ -63,7 +110,7 @@ export function MainPage() {
   }
   else{
     return (
-      <div style={{marginTop: '5vmax'}}>{text.loading[leng]}</div>
+      <div style={{marginTop: '5vmax'}}>Loading...</div>
     )
   }
 
