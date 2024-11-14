@@ -9,9 +9,9 @@ export function CreateNewBotForm(props) {
     const [value, setValue] = useState('')
     const [resStatus, setResStatus] = useState(link)
 
-    useMemo(() => {
-        setResStatus(link)
-    }, [link, setResStatus])
+    // useMemo(() => {
+    //     setResStatus(link)
+    // }, [link, setResStatus])
 
     SocketApt.socket?.on('createNewBot', (data) => {
         console.log(data)
