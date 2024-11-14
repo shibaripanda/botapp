@@ -1,7 +1,6 @@
 import { LoginButton } from '@telegram-auth/react'
 import axios from "axios"
 import { useNavigate } from 'react-router-dom'
-import { fix } from '../fix/fix'
 
 export function TelegramVidget() {
     console.log(process.env.REACT_APP_BOTNAME)
