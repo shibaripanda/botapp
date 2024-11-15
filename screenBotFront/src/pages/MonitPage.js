@@ -13,6 +13,7 @@ import { pipSendSocket } from '../socket/pipSendSocket.ts'
 import { ButtonApp } from '../components/comps/ButtonApp.tsx'
 import { TextApp } from '../components/comps/TextApp.tsx'
 import { TextInputApp } from '../components/comps/TextInputApp.tsx'
+import axios from 'axios'
 
 export function MonitPage() {
   
@@ -33,6 +34,39 @@ export function MonitPage() {
   const [activGroup, setActivGroup] = useState({})
   const [rename, setRename] = useState(false)
   const [newGroupName, setNewGroupName] = useState('')
+
+  const [text, setText] = useState(window.textBotApp ? window.textBotApp: false)
+  const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : false)
+
+  async function getText(){
+    const text = await axios({
+      method: 'GET',
+      url: `${process.env.REACT_APP_SERVERLINK}/app/text`,
+      timeout: 10000
+    })
+    window.textBotApp = text.data
+    setText(text.data)
+  }
+  async function userLenguage(){
+    const l = window.navigator.language.substring(0,2) ? window.navigator.language.substring(0,2) : 'en'
+    const avLengs = await axios({
+      method: 'GET',
+      url: `${process.env.REACT_APP_SERVERLINK}/app/avleng`,
+      timeout: 10000
+    })
+    window.avlengBotApp = avLengs.data
+    // setAvLeng(avLengs.data)
+    if(!avLengs.data.map(item => item.index).includes(l)){
+      window.lengBotApp = 'en'
+      setLeng('en')
+    }
+    else{
+      if(!window.lengBotApp){
+        window.lengBotApp = l
+        setLeng(l)
+      }
+    }
+  }
 
   const usersFilter = useMemo(() => {
       const checkActiv = () => {
@@ -66,6 +100,11 @@ export function MonitPage() {
       pipSendSocket('getScreens', botId)
       pipSendSocket('idForEditScreen', {botId: botId, screenId: ''})
       setStatus(true)
+      if(!text || !leng){
+        console.log('update lenguage')
+        getText()
+        userLenguage()
+      }
     }
   }, [botId])
 
@@ -177,22 +216,22 @@ export function MonitPage() {
   }
 
  
-  if(users && status && screens.length){
+  if(users && status && screens.length && text && leng){
     return (
       <div style={{width: '100%', marginTop: '0.5vmax', marginBottom: '3vmax', marginLeft: '0.5vmax', marginRight: '0.5vmax'}}>
         <Grid align="center">
             <Grid.Col span={2}>
-              <ButtonApp title='Back to all bots' handler={() => navigate(`/main`)}  color='grey'/>
+              <ButtonApp title={text.back[leng]} handler={() => navigate(`/main`)}  color='grey'/>
             </Grid.Col>
             <Grid.Col span={3}>
               <Center>
-                <TextApp title='Users: ' text={botName} />
+                <TextApp title={`${text.monit[leng]}: `} text={botName} />
               </Center>
             </Grid.Col>
             <Grid.Col span={3.5}>
               <Center>
                 <Switch
-                label="Only active users"
+                label={text.onlyActiv[leng]}
                 radius="lg"
                 color='green'
                 checked={checked}

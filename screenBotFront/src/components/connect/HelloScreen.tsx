@@ -5,7 +5,6 @@ import React from 'react';
 import { TelegramVidget } from '../../modules/TelegramVidget';
 
 export function HelloScreen(props) {
-  console.log(props)
   return (
     <Container size="md">
       <div className={classes.inner}>

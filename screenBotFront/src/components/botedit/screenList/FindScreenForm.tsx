@@ -1,9 +1,9 @@
 import React from 'react'
 import { Button, Grid, Group, Paper, Text, TextInput } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
-import { SpesialListMenu } from '../SpesialListMenu.tsx'
+// import { SpesialListMenu } from '../SpesialListMenu.tsx'
 
-export function FindScreenForm({spScreen, setSpScreen, screenFilterLength, bot, screens, createScreen, newScreenName, setNewScreenName, filterScreens, setFilterScreens}) {
+export function FindScreenForm({text, leng, spScreen, setSpScreen, screenFilterLength, bot, screens, createScreen, newScreenName, setNewScreenName, filterScreens, setFilterScreens}) {
 
     const navigate = useNavigate()
 
@@ -24,9 +24,9 @@ export function FindScreenForm({spScreen, setSpScreen, screenFilterLength, bot, 
                     onClick={() => {
                     navigate(`/main`)
                     }}>
-                    Back to all bots
+                    {text.back[leng]}
                 </Button>
-                <Text fw={700}>Constructor: {bot.name + ' (@' + bot.username + ')'}</Text>
+                <Text fw={700}>{text.constr[leng]}: {bot.name + ' (@' + bot.username + ')'}</Text>
             </Group>
 
             <hr style={{marginBottom: '2vmax', marginTop: '1.2vmax'}}></hr>
@@ -35,8 +35,8 @@ export function FindScreenForm({spScreen, setSpScreen, screenFilterLength, bot, 
                 <Grid.Col span={12} key={0}>
                     <TextInput
                         size='xs'
-                        description='Create new screen'
-                        placeholder="new screen name"
+                        description={text.createNewScreen[leng]}
+                        placeholder={text.newScreenName[leng]}
                         value={newScreenName}
                         onChange={(event) => {
                             setNewScreenName(event.currentTarget.value)
@@ -51,7 +51,7 @@ export function FindScreenForm({spScreen, setSpScreen, screenFilterLength, bot, 
                             createScreen(newScreenName)
                             setNewScreenName('')
                             }}>
-                        Create new screen
+                        {text.createNewScreen[leng]}
                     </Button>
                 </Grid.Col>
                 <Grid.Col span={6} key={2}>
@@ -74,8 +74,8 @@ export function FindScreenForm({spScreen, setSpScreen, screenFilterLength, bot, 
                 <Grid.Col span={12} key={0}>
                     <TextInput
                         size='xs'
-                        description='Find screen by name:'
-                        placeholder="screen name"
+                        description={text.findScreenByName[leng]}
+                        placeholder={text.screenName[leng]}
                         value={filterScreens}
                         onChange={(event) => {
                             setFilterScreens(event.currentTarget.value)
@@ -89,7 +89,7 @@ export function FindScreenForm({spScreen, setSpScreen, screenFilterLength, bot, 
                         onClick={() => {
                             setFilterScreens('')
                             }}>
-                        Reset filter ({screenFilterLength}/{screens.length})
+                        {text.resetFilter[leng]} ({screenFilterLength}/{screens.length})
                     </Button>
                 </Grid.Col>
             </Grid>

@@ -55,18 +55,18 @@ export function BotItem({bot, deleteBot, offBot, onBot, text, leng}) {
           {/* Status: {botStatus(bot.status)} */}
         </Grid.Col>
         <Grid.Col span={2}>
-          Status {botStatus(bot.status)}
+        {text.status[leng]} {botStatus(bot.status)}
         </Grid.Col>
       </Grid>
 
       <Text c="dimmed" fz="xs">
-        Created: {new Date(bot.createdAt).toLocaleDateString()}
+        {text.created[leng]}: {new Date(bot.createdAt).toLocaleDateString()}
       </Text>
       <Text c="dimmed" fz="xs">
         id: {bot._id}
       </Text>
       <Text c="dimmed" fz="xs">
-        Add-content mode: {contentMode(bot.mode)}
+        {text.addContentMode[leng]}: {contentMode(bot.mode)}
       </Text>
 
       <Grid style={{marginTop: '1.5vmax'}}>
@@ -112,22 +112,22 @@ export function BotItem({bot, deleteBot, offBot, onBot, text, leng}) {
       <hr  style={{marginTop: '1.5vmax'}}></hr>
 
       <Grid style={{marginTop: '1vmax'}}>
+        <Grid.Col span={2}></Grid.Col>
         <Grid.Col span={2.5}></Grid.Col>
-        <Grid.Col span={2.5}></Grid.Col>
-        <Grid.Col span={2}>
+        <Grid.Col span={2.5}>
           {onOffButton()}
         </Grid.Col>
-        <Grid.Col span={3}>
+        <Grid.Col span={2.5}>
           <TextInput
                       size="xs"
-                      placeholder='Text bot`s name for delete'
+                      placeholder={text.botName[leng]} 
                       value={deleteValue}
                       onChange={(event) => {
                         setDeleteValue(event.currentTarget.value)
                       }}
                       />
         </Grid.Col>
-        <Grid.Col span={2}>
+        <Grid.Col span={2.5}>
           <Button fullWidth
                   disabled={deleteButton()}
                   color='red'

@@ -4,14 +4,12 @@ import { SocketApt } from '../../socket/api/socket-api.ts'
 
 export function CreateNewBotForm(props) {
 
-    let link = <div>{props.text.createNewBot[props.leng]} <Anchor size='sm' href="https://t.me/BotFather" target="_blank">BotFather</Anchor></div>
-
     const [value, setValue] = useState('')
-    const [resStatus, setResStatus] = useState(link)
+    const [resStatus, setResStatus] = useState(<div>{props.text.createNewBot[props.leng]} <Anchor size='sm' href="https://t.me/BotFather" target="_blank">BotFather</Anchor></div>)
 
-    // useMemo(() => {
-    //     setResStatus(link)
-    // }, [link, setResStatus])
+    useMemo(() => {
+        setResStatus(<div>{props.text.createNewBot[props.leng]} <Anchor size='sm' href="https://t.me/BotFather" target="_blank">BotFather</Anchor></div>)
+    }, [setResStatus, props.leng, props.text.createNewBot])
 
     SocketApt.socket?.on('createNewBot', (data) => {
         console.log(data)

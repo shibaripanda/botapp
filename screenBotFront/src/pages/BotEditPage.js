@@ -9,6 +9,7 @@ import { ScreenItem } from '../components/botedit/screenList/ScreenItem.tsx'
 import { Grid } from '@mantine/core'
 import { pipGetSocket } from '../socket/pipGetSocket.ts'
 import { pipSendSocket } from '../socket/pipSendSocket.ts'
+import axios from 'axios'
 
 export function BotEditPage() {
 
@@ -22,6 +23,39 @@ export function BotEditPage() {
   const [status, setStatus] = useState(false)
   const [spScreen, setSpScreen] = useState('')
   const [content, setContent] = useState([])
+
+  const [text, setText] = useState(window.textBotApp ? window.textBotApp: false)
+  const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : false)
+
+  async function getText(){
+    const text = await axios({
+      method: 'GET',
+      url: `${process.env.REACT_APP_SERVERLINK}/app/text`,
+      timeout: 10000
+    })
+    window.textBotApp = text.data
+    setText(text.data)
+  }
+  async function userLenguage(){
+    const l = window.navigator.language.substring(0,2) ? window.navigator.language.substring(0,2) : 'en'
+    const avLengs = await axios({
+      method: 'GET',
+      url: `${process.env.REACT_APP_SERVERLINK}/app/avleng`,
+      timeout: 10000
+    })
+    window.avlengBotApp = avLengs.data
+    // setAvLeng(avLengs.data)
+    if(!avLengs.data.map(item => item.index).includes(l)){
+      window.lengBotApp = 'en'
+      setLeng('en')
+    }
+    else{
+      if(!window.lengBotApp){
+        window.lengBotApp = l
+        setLeng(l)
+      }
+    }
+  }
 
   const reverseScreens = async (data) => {
     getScreens(await data.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)))
@@ -44,6 +78,11 @@ export function BotEditPage() {
       pipSendSocket('getBot', botId)
       pipSendSocket('getScreens', botId)
       setStatus(true)
+      if(!text || !leng){
+        console.log('update lenguage')
+        getText()
+        userLenguage()
+      }
     }
   }, [botId])
 
@@ -102,6 +141,8 @@ export function BotEditPage() {
         screenFilter.map((item, index) => 
           <Grid.Col span={4} key={index}>
             <ScreenItem
+              text={text}
+              leng={leng}
               content={content}
               screens={screens}
               protectScrreen={protectScrreen} 
@@ -132,12 +173,14 @@ export function BotEditPage() {
   }
 
   
-  if(bot && screens && status){
+  if(bot && screens && status && text && leng){
     return (
       <div style={{width: '75vmax', marginTop: '3vmax', marginBottom: '3vmax'}}>
         <Grid justify="flex-start" align="stretch">
           <Grid.Col span={8} key={1000}>
             <FindScreenForm
+              text={text}
+              leng={leng}
               bot={bot} 
               screens={screens}
               screenFilterLength={screenFilter.length} 

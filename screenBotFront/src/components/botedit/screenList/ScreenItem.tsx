@@ -2,7 +2,7 @@ import { Button, Paper, Text, Group, TextInput } from '@mantine/core';
 import React, { useState } from 'react'
 import { ModalCreateScreen } from './ModalCreateScreen.tsx'
 
-export function ScreenItem({addContentItem, content, deleteContentItem, editScreenName, copyScreen, screenForAnswer, updateVariable, screens, editButtons, clearScreen, protectScrreen, editScreen, bot, screen, deleteScreen, sendMeScreen}) {
+export function ScreenItem({text, leng, addContentItem, content, deleteContentItem, editScreenName, copyScreen, screenForAnswer, updateVariable, screens, editButtons, clearScreen, protectScrreen, editScreen, bot, screen, deleteScreen, sendMeScreen}) {
 
   const [deleteValue, setDeleteValue] = useState('')
 
@@ -17,7 +17,7 @@ export function ScreenItem({addContentItem, content, deleteContentItem, editScre
         <Group justify="flex-end" mt="md" grow>
           <TextInput
             size="xs"
-            placeholder='Text screen`s name for delete'
+            placeholder={text.screenNameForDelete[leng]}
             value={deleteValue}
             onChange={(event) => {
               setDeleteValue(event.currentTarget.value)
@@ -41,7 +41,7 @@ export function ScreenItem({addContentItem, content, deleteContentItem, editScre
               setDeleteValue('')
             }}
           >
-            Delete
+          {text.delete[leng]}
           </Button>
         </Group>
       )
@@ -64,11 +64,12 @@ export function ScreenItem({addContentItem, content, deleteContentItem, editScre
         id: {screen._id}
       </Text>
       <Text c="dimmed" fz="xs">
-        {new Date(screen.createdAt).toLocaleDateString()}
+        {text.created[leng]}: {new Date(screen.createdAt).toLocaleDateString()}
       </Text>
       <Text c="dimmed" fz="xs">
-        Activ links to this screen: {usedCount()}
+        {text.activLinkToScreen[leng]}: {usedCount()}
       </Text>
+      <hr style={{marginBottom: '1vmax', marginTop: '0.3vmax'}}></hr>
       <Text c="dimmed" fz="xs">
         Text: {screen.text.substring(0, 20)}...
       </Text>
@@ -86,14 +87,16 @@ export function ScreenItem({addContentItem, content, deleteContentItem, editScre
           onClick={() => {
             sendMeScreen(screen._id)
           }}>
-          Send me
+          {text.sendMe[leng]}
         </Button>
         <ModalCreateScreen 
           modalTitle={
             <Text c="dimmed" fz="md">
-              {`❗️⚠️ Content your sent to the ${bot.name} will be added to this screen ⚠️❗️`}
+              {`❗️⚠️ ${text.sendContentToBot[leng]} (${bot.name}) ⚠️❗️`}
             </Text>
           }
+          text={text}
+          leng={leng}
           content={content} 
           screen={screen}
           editScreen={editScreen} 
@@ -112,7 +115,7 @@ export function ScreenItem({addContentItem, content, deleteContentItem, editScre
           onClick={() => {
             copyScreen(screen._id)
           }}>
-          Copy
+          {text.copy[leng]}
         </Button>
       </Group>
       {startScreen()}

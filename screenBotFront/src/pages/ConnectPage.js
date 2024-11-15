@@ -7,9 +7,11 @@ import { LanguagePicker } from '../components/LanguagePicker/LanguagePicker.tsx'
 
 export function ConnectPage() {
 
-  const [text, setText] = useState(false)
-  const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : 'en')
-  const [avLeng, setAvLeng] = useState(false)
+  console.log('Connect page')
+
+  const [text, setText] = useState(window.textBotApp ? window.textBotApp: false)
+  const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : false)
+  const [avLeng, setAvLeng] = useState(window.avlengBotApp ? window.avlengBotApp : false)
 
   async function getText(){
     const text = await axios({
@@ -27,6 +29,7 @@ export function ConnectPage() {
       url: `${process.env.REACT_APP_SERVERLINK}/app/avleng`,
       timeout: 10000
     })
+    window.avlengBotApp = avLengs.data
     setAvLeng(avLengs.data)
     if(!avLengs.data.map(item => item.index).includes(l)){
       window.lengBotApp = 'en'
@@ -40,18 +43,20 @@ export function ConnectPage() {
     }
   }
   async function userSetLeng(leng) {
-    console.log(leng)
     window.lengBotApp = leng
     setLeng(leng)
   }
 
   useEffect(() => {
     sessionStorage.removeItem('token')
-    getText()
-    userLenguage()
+    if(!text || !leng || !avLeng){
+      console.log('update lenguage')
+      getText()
+      userLenguage()
+    }
   }, [])
 
-  if(text){
+  if(text && avLeng && leng){
     return (
       <div style={{marginTop: '10vmax'}}>
         <div style={{marginLeft: '1vmax', marginBottom: '1vmax'}}>

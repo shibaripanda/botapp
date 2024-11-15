@@ -11,18 +11,15 @@ import axios from 'axios'
 import { LanguagePicker } from '../components/LanguagePicker/LanguagePicker.tsx'
 
 export function MainPage() {
-  console.log('main')
+  console.log('Main page')
   useConnectSocket()
 
   const [status, setStatus] = useState(false)
   const [bots, setBots] = useState(false)
 
-  const [text, setText] = useState(window.textBotApp ? window.textBotApp : false)
-  const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : 'en')
-  const [avLeng, setAvLeng] = useState(false)
-
-  // const text = window.textBotApp
-  // const leng = window.lengBotApp
+  const [text, setText] = useState(window.textBotApp ? window.textBotApp: false)
+  const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : false)
+  const [avLeng, setAvLeng] = useState(window.avlengBotApp ? window.avlengBotApp : false)
 
   async function getText(){
     const text = await axios({
@@ -72,7 +69,8 @@ export function MainPage() {
       pipGetSocket(pipSocketListners)
       pipSendSocket('getMyBots')
       setStatus(true)
-      if(!window.textBotApp){
+      if(!text || !leng || !avLeng){
+        console.log('update lenguage')
         getText()
         userLenguage()
       }
@@ -97,7 +95,7 @@ export function MainPage() {
   }
 
   
-  if(bots && status && text){
+  if(bots && status && text && avLeng && leng){
     return (
       <div style={{width: '55vmax', marginTop: '3vmax', marginBottom: '3vmax'}}>
         <div style={{marginBottom: '1vmax'}}>

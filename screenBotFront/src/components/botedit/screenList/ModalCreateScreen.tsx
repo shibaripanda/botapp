@@ -3,7 +3,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { Modal, Button, Text, Group, Switch, Grid, Spoiler, Tooltip, TextInput, Autocomplete, Image, Select } from '@mantine/core'
 import { ButtonApp } from '../../comps/ButtonApp.tsx'
 
-export function ModalCreateScreen({addContentItem, content, deleteContentItem, editScreenName, screenForAnswer, updateVariable, screens, editButtons, clearScreen, protectScrreen, editScreen, modalTitle, screen, sendMeScreen}) {
+export function ModalCreateScreen({text, leng, addContentItem, content, deleteContentItem, editScreenName, screenForAnswer, updateVariable, screens, editButtons, clearScreen, protectScrreen, editScreen, modalTitle, screen, sendMeScreen}) {
 
   const [opened, { open, close }] = useDisclosure(false)
   const [checked, setChecked] = useState(screen.protect)
@@ -66,7 +66,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
             updateVariable(screen._id, variable)
             setVariable('')
           }}>
-          Save variable
+          {text.saveConst[leng]}
         </Button>
       )
     }
@@ -74,7 +74,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
       return (
         <>
        <Autocomplete
-          description='Screen if recived answer'
+          description={text.toScreenIfAnswer[leng]}
           style={{marginTop: '0.5vmax'}}
           placeholder={screens.find(item => item._id === screen.ansScreen) ? screens.find(item => item._id === screen.ansScreen)['name'] : 'not set'}
           data={screens.map(item => item.name + ' ' + item._id)}
@@ -92,7 +92,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
           screenForAnswer(screen._id, '')
           setVariable('')
         }}>
-        Delete variable "{screen.variable}"
+        {text.deleteConst[leng]} "{screen.variable}"
       </Button>
         </>
       )
@@ -111,9 +111,9 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
       }
     }
     
-    const toolTipText = (text, name) => {
-      if(text === '➕') return 'Add button'
-      return 'Delete ' + name.name
+    const toolTipText = (textt, name) => {
+      if(textt === '➕') return text.addBut[leng]
+      return `${text.delete[leng]} ` + name.name
     }
 
     const showSaveKeyboard = () => {
@@ -124,7 +124,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
                 editButtons(screen._id, buttons)
                 setControlCheck(true)
               }}>
-              Save keyboard
+              {text.saveKeyboard[leng]}
             </Button>
         )
       }
@@ -164,8 +164,8 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
       const creatingButtonName = () => {
         return (
           <TextInput
-                description='Create new button'
-                placeholder="button name"
+                description={text.createBut[leng]}
+                placeholder={text.butName[leng]}
                 value={newBut.text}
                 onChange={(event) => {
                   setNewBut({...newBut, text: event.currentTarget.value})
@@ -178,8 +178,8 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
         if(newBut.text){
           return (
             <Autocomplete
-              label="Link to your screen or internet link"
-              placeholder="target"
+              label={text.screenOrLink[leng]}
+              placeholder={text.target[leng]}
               data={screens.map(item => item.name + ' ' + item._id)}
               value={greate}
               onChange={(event) => {
@@ -187,7 +187,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
                 if(screens.map(item => item._id).includes(check[check.length - 1])){
                   setNewBut({...newBut, to: check[check.length - 1], action: 'callback'})
                   check.splice(check.length - 1, 1)
-                  setGreate(check.join(' ') + ' (your screen)')
+                  setGreate(check.join(' ') + ` (${text.yourScreen[leng]})`)
                 }
                 else{
                   setNewBut({...newBut, to: event, action: 'url'})
@@ -277,20 +277,20 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
               onClick={() => {
                 setModeEditName(true)
               }}>
-              Edit name
+              {text.rename[leng]}
             </Button>
             <Button style={{marginLeft: '1vmax'}} variant="default" size="xs"
               onClick={() => {
                 sendMeScreen(screen._id)
               }}>
-              Send me
+              {text.sendMe[leng]}
             </Button>
             <Button style={{marginLeft: '1vmax'}} color='red' size="xs"
               onClick={() => {
                 clearScreen(screen._id)
                 setButtons([])
               }}>
-              Clear screen
+              {text.clearScreen[leng]}
             </Button>
           </div>
         </Group>
@@ -313,13 +313,13 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
               editScreenName(screen._id, screenName)
               setModeEditName(false)
             }}>
-            Save new name
+            {text.saveName[leng]}
           </Button>
           <Button style={{marginLeft: '1vmax'}} variant="default" size="xs"
               onClick={() => {
                 setModeEditName(false)
               }}>
-            Cancel
+            {text.cancel[leng]}
           </Button>
         </div>
       </Group>
@@ -386,7 +386,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
 
         <Switch
             style={{marginTop: '1.5vmax', marginBottom: '1.5vmax'}}
-            label="Protect content"
+            label={text.protectContent[leng]}
             radius="lg"
             color='red'
             checked={checked}
@@ -407,7 +407,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
             <td>
               <Group gap="xs" style={{marginLeft: '1vmax'}} >
                   {screen.media.map((item, index) =>
-                  <Tooltip label={item.tx ? item.tx + ' delete' : 'noname delete'} key={index}>
+                  <Tooltip label={item.tx ? item.tx + ` ${text.delete[leng]}` : `noname ${text.delete[leng]}`} key={index}>
                     {imageOrVide(item)}
                 </Tooltip>)}
               </Group>
@@ -422,7 +422,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
             <td>
             <Group gap="xs" style={{marginLeft: '1vmax'}} >
               {screen.document.map((item, index) =>
-              <Tooltip label={item.tx ? item.tx + ' delete' : 'noname delete'} key={index}>
+              <Tooltip label={item.tx ? item.tx + ` ${text.delete[leng]}` : `noname ${text.delete[leng]}`} key={index}>
                 <Button variant="default" h='4.5vmax' w='auto'
                     onClick={() => {
                       deleteContentItem(screen._id, 'document', item)
@@ -442,7 +442,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
             <td>
             <Group gap="xs" style={{marginLeft: '1vmax'}} >
               {screen.audio.map((item, index) => 
-              <Tooltip label={item.tx ? item.tx + ' delete' : 'noname delete'} key={index}>
+              <Tooltip label={item.tx ? item.tx + ` ${text.delete[leng]}` : `noname ${text.delete[leng]}`} key={index}>
                 <Button variant="default" h='4.5vmax' w='auto'
                     onClick={() => {
                       deleteContentItem(screen._id, 'audio', item)
@@ -459,13 +459,13 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
         {textSize()}
         <hr style={{marginTop: '0.5vmax', marginBottom: '1vmax'}}></hr>
         <Grid align='center'>
-          <Grid.Col span={2}>
-            <ButtonApp title='Add existing content' disabled={!exContent} handler={() => {
+          <Grid.Col span={4}>
+            <ButtonApp title={text.addExCont[leng]} disabled={!exContent} handler={() => {
               addContentItem(screen._id, exContent)
               // setExContent('')
               }} />
           </Grid.Col>
-          <Grid.Col span={4}>
+          <Grid.Col span={8}>
             <Select
               size='xs'
               clearable
@@ -489,7 +489,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
 
         <div style={{marginTop: '3vmax'}} >
           <TextInput
-                description='Save the answer on this screen to a variable'
+                description={text.saveToConst[leng]}
                 placeholder={screen.variable ? screen.variable : 'not set'}
                 value={variable}
                 onChange={(event) => {
@@ -500,7 +500,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
           
           <Switch
             style={{marginTop: '2.5vmax', marginBottom: '1.5vmax'}}
-            label="Edit buttons mode"
+            label={text.editKeyboardMode[leng]}
             radius="lg"
             color='red'
             checked={editButtonsMode}
@@ -520,7 +520,7 @@ export function ModalCreateScreen({addContentItem, content, deleteContentItem, e
             editScreen(screen._id)
             open()
             }}>
-        Edit
+        {text.edit[leng]}
       </Button>
     </>
   )
