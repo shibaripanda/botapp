@@ -1,7 +1,7 @@
 import { Button, Grid, Image, Spoiler, Table, Text, TextInput, Tooltip } from "@mantine/core"
 import React, { useState } from 'react'
 
-export const ContentList = ({data, deleteContent, sendMeContent, renameMeContent}) => {
+export const ContentList = ({text, leng, data, deleteContent, sendMeContent, renameMeContent}) => {
 
   const [rename, setRename] = useState({})
 
@@ -49,8 +49,8 @@ export const ContentList = ({data, deleteContent, sendMeContent, renameMeContent
                 onClick={() => {
                   renameMeContent(element, rename['newName'])
                   setRename({})
-                }}
-                >Save
+                }}>
+                {text.save[leng]}
               </Button>
             </Grid.Col>
             <Grid.Col span={4}>
@@ -60,14 +60,14 @@ export const ContentList = ({data, deleteContent, sendMeContent, renameMeContent
                 size="xs"
                 onClick={() => setRename({})}
                 >
-                  Cancel
+                {text.cancel[leng]}
               </Button>
             </Grid.Col>
           </Grid>
         )
       }
       return (
-        <Tooltip label={'click to rename'}>
+        <Tooltip label={text.rename[leng]}>
           <div 
             onClick={() => {
               setRename({index: index, newName: ''})
@@ -106,7 +106,7 @@ export const ContentList = ({data, deleteContent, sendMeContent, renameMeContent
             onClick={() => {
               sendMeContent(element)
             }}>
-            Send me
+            {text.test[leng]}
           </Button>
         </Table.Td>
         <Table.Td w='5%'>
@@ -116,7 +116,7 @@ export const ContentList = ({data, deleteContent, sendMeContent, renameMeContent
             onClick={() => {
               deleteContent(element)
             }}>
-            Delete
+            {text.delete[leng]}
           </Button>
         </Table.Td>
       </Table.Tr>

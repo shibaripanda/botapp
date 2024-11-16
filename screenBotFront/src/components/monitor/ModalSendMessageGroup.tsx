@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Button, Select, ComboboxItem, Textarea, Text, Grid, LoadingOverlay, Group, Box } from '@mantine/core'
 
-export function ModalSendMessageGroup({selectedRows, content, screens, sendScreenToUser, sendTextToUser, sendContentToUser}) {
+export function ModalSendMessageGroup({text1, leng, selectedRows, content, screens, sendScreenToUser, sendTextToUser, sendContentToUser}) {
 
   const [opened, { open, close }] = useDisclosure(false)
   const [screen, setScreen] = useState<ComboboxItem | null>(null)
@@ -19,9 +19,9 @@ export function ModalSendMessageGroup({selectedRows, content, screens, sendScree
   }
   const textLength = (text) => {
     if(text.length > 4096){
-      return <Text fz='sm' c='red'>Text {text.length}/4096</Text>
+      return <Text fz='sm' c='red'>{text1.text[leng]} {text.length}/4096</Text>
     }
-    return <Text fz='sm' c='grey'>Text {text.length}/4096</Text>
+    return <Text fz='sm' c='grey'>{text1.text[leng]} {text.length}/4096</Text>
   }
   const statusUser = (status) => {
     if(status) return '✅'
@@ -33,17 +33,17 @@ export function ModalSendMessageGroup({selectedRows, content, screens, sendScree
     
       <Modal size={'xl'} opened={opened} 
         onClose={close} 
-        title={`Message to selected (${selectedRows.length})`}
+        title={`${text1.mesToSelect[leng]} (${selectedRows.length})`}
       >
        <Box pos="relative">
-        <LoadingOverlay visible={visible} loaderProps={{ children: 'Sending... please wait' }} /> 
+        <LoadingOverlay visible={visible} loaderProps={{ children: text1.sendWait[leng] }} /> 
         <Grid>
           {selectedRows.map((item, index)=> <Grid.Col key={index} span={3}>@{item.username}{statusUser(item.status)}</Grid.Col>)}
         </Grid>
         <hr style={{marginBottom: '2vmax', marginTop: '1vmax'}}></hr>
         <Select clearable
           searchable
-          description={<Text fz='sm' c='grey'>Screen or content</Text>}
+          description={<Text fz='sm' c='grey'>{text1.screenOContent[leng]}</Text>}
           style={{marginTop: '0.5vmax'}}
           data={
             screens.map(item => ({label: item.name + ' ( screen )', value: item._id}))
@@ -91,7 +91,7 @@ export function ModalSendMessageGroup({selectedRows, content, screens, sendScree
             }
             setScreen(null)
         }}>
-        Send screen or content
+        {text1.sendScreenContent[leng]}
         </Button>
         <Textarea autosize
           minRows={2}
@@ -121,7 +121,7 @@ export function ModalSendMessageGroup({selectedRows, content, screens, sendScree
             }
             setText('')
           }}>
-          Send text
+          {text1.sendText[leng]}
         </Button>
         </Box>
       </Modal>
@@ -132,7 +132,7 @@ export function ModalSendMessageGroup({selectedRows, content, screens, sendScree
         onClick={() => {
             open()
             }}>
-        Message to selected ({selectedRows.length})
+        {text1.mesToSelect[leng]} ({selectedRows.length})
       </Button>
     </>
   )

@@ -87,7 +87,7 @@ export function ScreenItem({text, leng, addContentItem, content, deleteContentIt
           onClick={() => {
             sendMeScreen(screen._id)
           }}>
-          {text.sendMe[leng]}
+          {text.test[leng]}
         </Button>
         <ModalCreateScreen 
           modalTitle={

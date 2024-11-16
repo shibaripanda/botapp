@@ -13,6 +13,7 @@ import { TextApp } from '../components/comps/TextApp.tsx'
 import { TextInputApp } from '../components/comps/TextInputApp.tsx'
 import { pipGetSocket } from '../socket/pipGetSocket.ts'
 import { pipSendSocket } from '../socket/pipSendSocket.ts'
+import axios from 'axios'
 
 export function EventPage() {
 console.log('s')
@@ -28,6 +29,39 @@ console.log('s')
   const [status, setStatus] = useState(false)
   const [eventName, setEventName] = useState('')
 
+  const [text, setText] = useState(window.textBotApp ? window.textBotApp: false)
+  const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : false)
+
+  async function getText(){
+    const text = await axios({
+      method: 'GET',
+      url: `${process.env.REACT_APP_SERVERLINK}/app/text`,
+      timeout: 10000
+    })
+    window.textBotApp = text.data
+    setText(text.data)
+  }
+  async function userLenguage(){
+    const l = window.navigator.language.substring(0,2) ? window.navigator.language.substring(0,2) : 'en'
+    const avLengs = await axios({
+      method: 'GET',
+      url: `${process.env.REACT_APP_SERVERLINK}/app/avleng`,
+      timeout: 10000
+    })
+    window.avlengBotApp = avLengs.data
+    // setAvLeng(avLengs.data)
+    if(!avLengs.data.map(item => item.index).includes(l)){
+      window.lengBotApp = 'en'
+      setLeng('en')
+    }
+    else{
+      if(!window.lengBotApp){
+        window.lengBotApp = l
+        setLeng(l)
+      }
+    }
+  }
+
   useEffect(() => {
     if(!sessionStorage.getItem('token')){
       window.location.assign(process.env.REACT_APP_BOTNAME)
@@ -41,10 +75,16 @@ console.log('s')
       pipSendSocket('getBot', botId)
       pipSendSocket('getEvents', botId)
       setStatus(true)
+      if(!text || !leng){
+        console.log('update lenguage')
+        getText()
+        userLenguage()
+      }
     }
   }, [])
 
   const eventFilter = useMemo(() => {
+    console.log('memo events')
       return events.filter(item => item.name.toLowerCase().includes(filterEvents.toLowerCase()))
     }, [filterEvents, events]
   )
@@ -69,17 +109,17 @@ console.log('s')
     updateEvent: async (event, newEvent) => pipSendSocket('updateEvent', {botId: bot._id, event: event, newEvent: newEvent})
   }
 
-  if(bot && status){
+  if(bot && status && text && leng){
     return (
       <div style={{width: '100%', marginTop: '0.5vmax', marginBottom: '3vmax', marginLeft: '0.5vmax', marginRight: '0.5vmax'}}>
 
         <Grid align="center">
           <Grid.Col span={2}>
-            <ButtonApp title='Back to all bots' handler={() => navigate(`/main`)} color='grey'/>
+            <ButtonApp title={text.back[leng]} handler={() => navigate(`/main`)} color='grey'/>
           </Grid.Col>
           <Grid.Col span={3}>
             <Center>
-              <TextApp title='Events:' text={botName} />
+              <TextApp title={`${text.events[leng]}:`} text={botName} />
             </Center>
           </Grid.Col>
           <Grid.Col span={3.5}>
@@ -90,7 +130,7 @@ console.log('s')
             </Center>
           </Grid.Col>
           <Grid.Col span={2}>
-            <TextInputApp placeholder='Event filter' value={filterEvents} handler={setFilterEvents}/>
+            <TextInputApp placeholder={text.filter[leng]} value={filterEvents} handler={setFilterEvents}/>
           </Grid.Col>
         </Grid>
 
@@ -98,25 +138,27 @@ console.log('s')
 
         <Grid style={{marginTop: '0.5vmax', marginBottom: '0.5vmax'}}>
           <Grid.Col span={2}>
-            <TextInputApp value={eventName} placeholder={'Event name'} handler={setEventName} />
+            <TextInputApp value={eventName} placeholder={text.eventName[leng]} handler={setEventName} />
           </Grid.Col>
           <Grid.Col span={2}>
             <ButtonApp 
-            title='Create a new multi-event' 
+            title={text.createNewEvent[leng]} 
             handler={() => {
               func.createEvent()
               setEventName('')
             }} 
             disabled={!eventName}/>
           </Grid.Col>
-          <Grid.Col span={2}>
+          {/* <Grid.Col span={2}>
             <ButtonApp title='Create a new one-time-event' handler={() => {func.createEvent({name: eventName}); setEventName('')}} disabled={!eventName}/>
-          </Grid.Col>
+          </Grid.Col> */}
         </Grid>
 
         <Grid>
           {eventFilter.map((item, index) => <Grid.Col key={index} span={4}>
             <EventItem
+              text={text}
+              leng={leng}
               updateEvent={func.updateEvent}
               oneEvent={item} 
               deleteEvent={func.deleteEvent}

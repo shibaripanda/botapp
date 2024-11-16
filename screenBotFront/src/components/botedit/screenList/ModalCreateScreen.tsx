@@ -283,7 +283,7 @@ export function ModalCreateScreen({text, leng, addContentItem, content, deleteCo
               onClick={() => {
                 sendMeScreen(screen._id)
               }}>
-              {text.sendMe[leng]}
+              {text.test[leng]}
             </Button>
             <Button style={{marginLeft: '1vmax'}} color='red' size="xs"
               onClick={() => {

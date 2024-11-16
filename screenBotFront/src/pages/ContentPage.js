@@ -12,6 +12,7 @@ import { pipSendSocket } from '../socket/pipSendSocket.ts'
 import { ButtonApp } from '../components/comps/ButtonApp.tsx'
 import { TextInputApp } from '../components/comps/TextInputApp.tsx'
 import { TextApp } from '../components/comps/TextApp.tsx'
+import axios from 'axios'
 
 export function ContentPage() {
   
@@ -25,6 +26,39 @@ export function ContentPage() {
   const [status, setStatus] = useState(false)
   const [content, setContent] = useState([])
   const [addContentmode, setAddContentMode] = useState('')
+
+  const [text, setText] = useState(window.textBotApp ? window.textBotApp: false)
+  const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : false)
+
+  async function getText(){
+    const text = await axios({
+      method: 'GET',
+      url: `${process.env.REACT_APP_SERVERLINK}/app/text`,
+      timeout: 10000
+    })
+    window.textBotApp = text.data
+    setText(text.data)
+  }
+  async function userLenguage(){
+    const l = window.navigator.language.substring(0,2) ? window.navigator.language.substring(0,2) : 'en'
+    const avLengs = await axios({
+      method: 'GET',
+      url: `${process.env.REACT_APP_SERVERLINK}/app/avleng`,
+      timeout: 10000
+    })
+    window.avlengBotApp = avLengs.data
+    // setAvLeng(avLengs.data)
+    if(!avLengs.data.map(item => item.index).includes(l)){
+      window.lengBotApp = 'en'
+      setLeng('en')
+    }
+    else{
+      if(!window.lengBotApp){
+        window.lengBotApp = l
+        setLeng(l)
+      }
+    }
+  }
 
   const contentFilter = useMemo(() => {
       return content.filter(item => (Object.values(item).join()).toLowerCase().includes(filter.toLowerCase()))
@@ -45,8 +79,13 @@ export function ContentPage() {
       pipSendSocket('getContent', botId)
       pipSendSocket('getAddContentMode', botId)
       setStatus(true)
+      if(!text || !leng){
+        console.log('update lenguage')
+        getText()
+        userLenguage()
+      }
     }
-  }, [botId])
+  }, [])
 
   const addContent = (status) => {
     pipSendSocket('idForEditScreen', {botId: botId, screenId: status})
@@ -71,26 +110,26 @@ export function ContentPage() {
   const addContentButtonStatus = () => {
     if(!addContentmode){
       return (
-        <ModalAddMode addContent={addContent} setAddContentMode={setAddContentMode}/>
+        <ModalAddMode text={text} leng={leng} addContent={addContent} setAddContentMode={setAddContentMode}/>
       )
     }
     return (
-      <ButtonApp title='Stop Add-content mode' handler={handler.stopAddContentModeHandler} color='red' />
+      <ButtonApp title={`STOP ${text.addContentMode[leng]}`} handler={handler.stopAddContentModeHandler} color='red' />
     )
   }
 
  
-  if(status){
+  if(status && text && leng){
     return (
       <div style={{width: '100%', marginTop: '0.5vmax', marginBottom: '3vmax', marginLeft: '0.5vmax', marginRight: '0.5vmax'}}>
 
         <Grid justify="center" align="center">
             <Grid.Col span={2}>
-              <ButtonApp title='Back to all bots' handler={() => navigate(`/main`)} color='grey'/>
+              <ButtonApp title={text.back[leng]} handler={() => navigate(`/main`)} color='grey'/>
             </Grid.Col>
             <Grid.Col span={3}>
               <Center>
-                <TextApp title='Content:' text={botName} />
+                <TextApp title={`${text.content[leng]}:`} text={botName} />
               </Center>
             </Grid.Col>
             <Grid.Col span={3.5}>
@@ -102,13 +141,13 @@ export function ContentPage() {
               </Center>
             </Grid.Col>
             <Grid.Col span={2}>
-              <TextInputApp placeholder="Content filter" value={filter} handler={setFilter} />
+              <TextInputApp placeholder={text.filter[leng]} value={filter} handler={setFilter} />
             </Grid.Col>
           </Grid>
 
         <hr style={{marginTop: '0.5vmax', marginBottom: '0.5vmax'}}></hr>
         
-        <ContentList data={contentFilter} renameMeContent={renameMeContent} deleteContent={deleteContent} sendMeContent={sendMeContent}/>
+        <ContentList text={text} leng={leng} data={contentFilter} renameMeContent={renameMeContent} deleteContent={deleteContent} sendMeContent={sendMeContent}/>
       </div>
     )
   }

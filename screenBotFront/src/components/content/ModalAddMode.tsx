@@ -3,7 +3,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { Modal, Group } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 
-export function ModalAddMode({addContent, setAddContentMode}) {
+export function ModalAddMode({text, leng, addContent, setAddContentMode}) {
 
   const [opened, { open, close }] = useDisclosure(false)
 
@@ -16,20 +16,20 @@ export function ModalAddMode({addContent, setAddContentMode}) {
     <>
       <Modal size='sm' opened={opened} 
         onClose={close} 
-        title={'Add content mode'}
+        title={text.addContentMode[leng]}
       >
       <div style={{marginBottom: '3vmax'}}>
-        Don't forget to turn off the mode when you add content
-        <br /><br />Switching to edit or monitor mode will automatically turn off this mode
-        <br /><br />After pressing "ok" send the required content to your bot, use the Telegram app
+        {text.contentRule1[leng]}
+        <br /><br />{text.contentRule2[leng]}
+        <br /><br />{text.contentRule3[leng]}
       </div>
       <Group justify="flex-end">
-      <ButtonApp title='Ok' color={'green'} handler={okContentModeHandler} />
-      <ButtonApp title='Cancel' handler={close} />
+      <ButtonApp title={text.ok[leng]} color={'green'} handler={okContentModeHandler} />
+      <ButtonApp title={text.cancel[leng]} handler={close} />
       </Group>
 
       </Modal>
-      <ButtonApp title='Add-content mode' handler={open} color='green'/>
+      <ButtonApp title={text.addContentMode[leng]} handler={open} color='green'/>
     </>
   )
 }

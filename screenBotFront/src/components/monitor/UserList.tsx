@@ -2,7 +2,7 @@ import { Table, Checkbox } from "@mantine/core";
 import React from 'react'
 import { ModalSendMessage } from "./ModalSendMessage.tsx";
 
-export const UserList = ({setSelectedRows, selectedRows, data, screens, sendScreenToUser, sendTextToUser, content, sendContentToUser}) => {
+export const UserList = ({text, leng, setSelectedRows, selectedRows, data, screens, sendScreenToUser, sendTextToUser, content, sendContentToUser}) => {
 
     const rowsList = Array.from(new Set((data.map(item => Object.keys(item.data))).flat(1)))
 
@@ -69,7 +69,7 @@ export const UserList = ({setSelectedRows, selectedRows, data, screens, sendScre
         {list(rowsList, element)}
         <Table.Td>{currentScreen(element.screen)}</Table.Td>
         <Table.Td>{status(element.activBot)}</Table.Td>
-        <Table.Td><ModalSendMessage sendContentToUser={sendContentToUser} content={content} screens={screens} activ={element.activBot} username={element.username} userId={element.id} user={element._id} sendScreenToUser={sendScreenToUser} sendTextToUser={sendTextToUser}/></Table.Td>
+        <Table.Td><ModalSendMessage text1={text} leng={leng} sendContentToUser={sendContentToUser} content={content} screens={screens} activ={element.activBot} username={element.username} userId={element.id} user={element._id} sendScreenToUser={sendScreenToUser} sendTextToUser={sendTextToUser}/></Table.Td>
       </Table.Tr>
       
     ))

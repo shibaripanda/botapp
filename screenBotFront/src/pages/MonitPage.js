@@ -130,16 +130,16 @@ export function MonitPage() {
   const selected = () => {
     if(selectedRows.length){
       return (
-        <ButtonApp title={`Unselect all`} handler={() => setSelectedRows([])} />
+        <ButtonApp title={text.unselect[leng]} handler={() => setSelectedRows([])} />
       )
     }
     else if(!usersFilter.length){
       return (
-        <ButtonApp title={`Select all`} handler={() => {}} disabled={true} />
+        <ButtonApp title={text.selectAll[leng]} handler={() => {}} disabled={true} />
       )
     }
     return (
-      <ButtonApp title={`Select all`} handler={handlers.setSelectedHandler} />
+      <ButtonApp title={text.selectAll[leng]} handler={handlers.setSelectedHandler} />
     )
   }
   const renameButAndInput = () => {
@@ -149,7 +149,7 @@ export function MonitPage() {
       )
     }
     return (
-      <TextApp title='Group: ' text={`${activGroup.name} (${activGroup.group.length})`} />
+      <TextApp title={`${text.group[leng]}: `} text={`${activGroup.name} (${activGroup.group.length})`} />
     )
   }
   const renameButAndInput1 = () => {
@@ -157,17 +157,17 @@ export function MonitPage() {
       return (
         <Grid>
           <Grid.Col span={6}>
-            <ButtonApp title={`Save`} handler={handlers.saveNewGroupName} disabled={!newGroupName}/>
+            <ButtonApp title={text.saveName[leng]} handler={handlers.saveNewGroupName} disabled={!newGroupName}/>
           </Grid.Col>
           <Grid.Col span={6}>
-            <ButtonApp title={`Cancel`} handler={handlers.cancelNewGroupName} />
+            <ButtonApp title={text.cancel[leng]} handler={handlers.cancelNewGroupName} />
           </Grid.Col>
         
         </Grid>
       )
     }
     return (
-      <ButtonApp title={`Rename group`} handler={() => setRename(true)} />
+      <ButtonApp title={text.rename[leng]} handler={() => setRename(true)} />
     )
   }
   const groupSettings = () => {
@@ -182,7 +182,7 @@ export function MonitPage() {
             {renameButAndInput1()}
           </Grid.Col>
           <Grid.Col span={2}>
-            <ButtonApp title={`Delete group`} handler={handlers.deleteGroupHandler} />
+            <ButtonApp title={text.deleteGroup[leng]} handler={handlers.deleteGroupHandler} />
           </Grid.Col>
         </Grid>
         <hr></hr>
@@ -246,7 +246,7 @@ export function MonitPage() {
               </Center>
             </Grid.Col>
             <Grid.Col span={2}>
-              <TextInputApp placeholder='Users filter' value={filter} handler={setFilter}/>
+              <TextInputApp placeholder={text.filter[leng]} value={filter} handler={setFilter}/>
             </Grid.Col>
           </Grid>
 
@@ -257,26 +257,26 @@ export function MonitPage() {
             {selected()}
           </Grid.Col>
           <Grid.Col span={2}>
-            <GroupListMenu deleteGroup={deleteGroup} groups={groups} setActivGroup={setActivGroup} activGroup={activGroup}/>
+            <GroupListMenu text={text} leng={leng} deleteGroup={deleteGroup} groups={groups} setActivGroup={setActivGroup} activGroup={activGroup}/>
           </Grid.Col>
           <Grid.Col span={2}>
-            <ButtonApp title={`Greate group (${selectedRows.length})`} handler={handlers.createGroupHandler} disabled={!selectedRows.length}/>
+            <ButtonApp title={`${text.createGroup[leng]} (${selectedRows.length})`} handler={handlers.createGroupHandler} disabled={!selectedRows.length}/>
           </Grid.Col>
           <Grid.Col span={2}>
-            <ModalSendMessageGroup selectedRows={selectedRows} sendContentToUser={sendContentToUser} content={content} screens={screens} sendScreenToUser={sendScreenToUser} sendTextToUser={sendTextToUser}/>
+            <ModalSendMessageGroup text1={text} leng={leng} selectedRows={selectedRows} sendContentToUser={sendContentToUser} content={content} screens={screens} sendScreenToUser={sendScreenToUser} sendTextToUser={sendTextToUser}/>
           </Grid.Col>
           <Grid.Col span={2}>
-            <ButtonApp title={`Create task`} handler={()=> {}} disabled={true}/>
+            <ButtonApp title={text.createTask[leng]} handler={()=> {}} disabled={true}/>
           </Grid.Col>
           <Grid.Col span={2}>
-            <ButtonApp title={`Download XLS`} handler={()=> {}} disabled={true}/>
+            <ButtonApp title={`${text.download[leng]} XLS`} handler={()=> {}} disabled={true}/>
           </Grid.Col>
         </Grid>
 
         {/* <hr></hr> */}
 
         {groupSettings()}
-        <UserList setSelectedRows={setSelectedRows} selectedRows={selectedRows} content={content} data={usersFilter} screens={screens} sendScreenToUser={sendScreenToUser} sendTextToUser={sendTextToUser} sendContentToUser={sendContentToUser}/>
+        <UserList text={text} leng={leng} setSelectedRows={setSelectedRows} selectedRows={selectedRows} content={content} data={usersFilter} screens={screens} sendScreenToUser={sendScreenToUser} sendTextToUser={sendTextToUser} sendContentToUser={sendContentToUser}/>
       </div>
     )
   }

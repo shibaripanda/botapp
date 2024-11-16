@@ -1,16 +1,18 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Grid, Paper, TextInput, Slider } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 import { TimeInput } from '@mantine/dates'
 
-export function ModalCreateEventPermament({oneEvent, updateEvent}) {
+export function ModalCreateEventPermament({text, leng, oneEvent, updateEvent}) {
 
   const [opened, { open, close }] = useDisclosure(false)
-  // const [eventName, setEventName] = useState(oneEvent.name)
-  const [editedEvent, setEditedEvent] = useState(oneEvent)
+  const [editedEvent, setEditedEvent] = useState(structuredClone(oneEvent))
   const [stat, setStat] = useState(0)
-  // const [value, setValue] = useState<number | string>(2200)
+
+  useMemo(() => {
+    setEditedEvent(structuredClone(oneEvent))
+  }, [oneEvent])
 
 
   const handlers = {
@@ -47,12 +49,12 @@ export function ModalCreateEventPermament({oneEvent, updateEvent}) {
       }
       if(Number(timeToTwoDigits(upH)) < 24){
         return (
-          <ButtonApp title={`Add slot ${timeToTwoDigits(upH)}:${timeToTwoDigits(upM)}`} handler={handlers.addSlot} />
+          <ButtonApp title={`${text.addSlot[leng]} ${timeToTwoDigits(upH)}:${timeToTwoDigits(upM)}`} handler={handlers.addSlot} />
         )
         // setStat(Date.now())
       }
       return (
-        <ButtonApp title={`Add slot`} disabled={true}/>
+        <ButtonApp title={text.addSlot[leng]} disabled={true}/>
       )
       
     },
@@ -96,7 +98,7 @@ export function ModalCreateEventPermament({oneEvent, updateEvent}) {
             }}
             size="xs"
             radius="sm"
-            label="Start slot"
+            label={text.startSlot[leng]}
           />
           </Grid.Col>
           <Grid.Col span={3}>
@@ -109,7 +111,7 @@ export function ModalCreateEventPermament({oneEvent, updateEvent}) {
               value={item.duration}
               size="xs"
               radius="sm"
-              label="Duration minutes"
+              label={text.durmin[leng]}
             />
           </Grid.Col>
           <Grid.Col span={3}>
@@ -122,7 +124,7 @@ export function ModalCreateEventPermament({oneEvent, updateEvent}) {
               value={item.break}
               size="xs"
               radius="sm"
-              label="Break minutes"
+              label={text.pausmin[leng]}
             />
             <Slider
               disabled={index !== editedEvent.slots.length - 1}
@@ -140,7 +142,7 @@ export function ModalCreateEventPermament({oneEvent, updateEvent}) {
           </Grid.Col>
           <Grid.Col span={3}>
             <ButtonApp
-              title={'Delete'}
+              title={text.delete[leng]}
               disabled={index !== editedEvent.slots.length - 1 || editedEvent.slots.length === 1}
               handler={() => {
                 editedEvent.slots.splice(-1)
@@ -169,7 +171,7 @@ export function ModalCreateEventPermament({oneEvent, updateEvent}) {
               value={editedEvent.name}
               size="xs"
               radius="sm"
-              label="Multi event name"
+              label={text.eventName[leng]}
             />
           </Grid.Col>
             {dayEvents}
@@ -186,7 +188,7 @@ export function ModalCreateEventPermament({oneEvent, updateEvent}) {
               </Grid.Col>
               <Grid.Col span={2}>
               <ButtonApp 
-                  title={'Cancel'} 
+                  title={text.cancel[leng]} 
                   handler={() => {
                     setEditedEvent(oneEvent)
                     close()
@@ -196,7 +198,7 @@ export function ModalCreateEventPermament({oneEvent, updateEvent}) {
               </Grid.Col>
               <Grid.Col span={2}>
                 <ButtonApp 
-                  title={'Save'} 
+                  title={text.save[leng]} 
                   handler={() => updateEvent(oneEvent, editedEvent)} 
                   disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
                 />
@@ -207,7 +209,7 @@ export function ModalCreateEventPermament({oneEvent, updateEvent}) {
      
 
       </Modal>
-      <ButtonApp title='Edit' handler={open} />
+      <ButtonApp title={text.edit[leng]} handler={open} />
     </>
   )
 }

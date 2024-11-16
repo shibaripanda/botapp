@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Button, Select, ComboboxItem, Textarea, Text } from '@mantine/core'
 
-export function ModalSendMessage({content, userId, username, screens, activ, user, sendScreenToUser, sendTextToUser, sendContentToUser}) {
+export function ModalSendMessage({text1, leng, content, userId, username, screens, activ, user, sendScreenToUser, sendTextToUser, sendContentToUser}) {
 
   const [opened, { open, close }] = useDisclosure(false)
   const [screen, setScreen] = useState<ComboboxItem | null>(null)
@@ -18,21 +18,21 @@ export function ModalSendMessage({content, userId, username, screens, activ, use
 
   const textLength = (text) => {
     if(text.length > 4096){
-      return <Text fz='sm' c='red'>Text {text.length}/4096</Text>
+      return <Text fz='sm' c='red'>{text1.text[leng]} {text.length}/4096</Text>
     }
-    return <Text fz='sm' c='grey'>Text {text.length}/4096</Text>
+    return <Text fz='sm' c='grey'>{text1.text[leng]} {text.length}/4096</Text>
   }
 
   return (
     <>
       <Modal size={'xl'} opened={opened} 
         onClose={close} 
-        title={`Message to @${username}`}
+        title={`${text1.message[leng]} to @${username}`}
       >
         <Select
           clearable
           searchable
-          description={<Text fz='sm' c='grey'>Screen or content</Text>}
+          description={<Text fz='sm' c='grey'>{text1.screenOContent[leng]}</Text>}
           style={{marginTop: '0.5vmax'}}
           data={
             screens.map(item => ({label: item.name + ' ( screen )', value: item._id}))
@@ -57,7 +57,7 @@ export function ModalSendMessage({content, userId, username, screens, activ, use
             }
             setScreen(null)
         }}>
-        Send screen or content
+        {text1.sendScreenContent[leng]}
         </Button>
         <Textarea
           autosize
@@ -74,7 +74,7 @@ export function ModalSendMessage({content, userId, username, screens, activ, use
             sendTextToUser(text, userId)
             setText('')
           }}>
-          Send text
+          {text1.sendText[leng]}
         </Button>
       </Modal>
 
@@ -83,7 +83,7 @@ export function ModalSendMessage({content, userId, username, screens, activ, use
         onClick={() => {
             open()
             }}>
-        Send message
+        {text1.sendMes[leng]}
       </Button>
     </>
   )

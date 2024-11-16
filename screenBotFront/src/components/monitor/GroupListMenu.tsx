@@ -1,7 +1,7 @@
 import { Menu, Button } from '@mantine/core';
 import React, { useState } from 'react'
 
-export function GroupListMenu({groups, setActivGroup, activGroup}) {
+export function GroupListMenu({text, leng, groups, setActivGroup, activGroup}) {
 
     const [opened, setOpened] = useState(false)
 
@@ -19,7 +19,7 @@ export function GroupListMenu({groups, setActivGroup, activGroup}) {
     <Menu shadow="md" width={200} opened={opened} onChange={setOpened} withArrow>
         <Menu.Target>
             <Button variant="default" size="xs" fullWidth disabled={!groups.length}>
-                {`Groups (${groups.length})`}
+                {`${text.groups[leng]} (${groups.length})`}
             </Button>
         </Menu.Target>
         <Menu.Dropdown>
@@ -27,7 +27,7 @@ export function GroupListMenu({groups, setActivGroup, activGroup}) {
             onClick={() => {
                 setActivGroup([])
             }}>
-            All users
+            {text.allUsers[leng]}
         </Menu.Item>
         <hr></hr>
             {menuItems}
