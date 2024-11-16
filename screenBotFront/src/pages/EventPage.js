@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import '../styles/App.css'
 import { useConnectSocket } from '../socket/hooks/useConnectSocket.ts'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Center, Grid } from '@mantine/core'
+import { Center, Grid, Switch } from '@mantine/core'
 import { EventItem } from '../components/events/EventItem.tsx'
 // import { ModalCreateEventOneTime } from '../components/events/ModalCreateEventOneTime.tsx'
 // import { ModalCreateEventPermament } from '../components/events/ModalCreateEventPermament.tsx'
@@ -16,7 +16,6 @@ import { pipSendSocket } from '../socket/pipSendSocket.ts'
 import axios from 'axios'
 
 export function EventPage() {
-console.log('s')
   const navigate = useNavigate()
   useConnectSocket()
   const {botId} = useParams()
@@ -28,6 +27,7 @@ console.log('s')
   const [filterEvents, setFilterEvents] = useState('')
   const [status, setStatus] = useState(false)
   const [eventName, setEventName] = useState('')
+  const [checked, setChecked] = useState(false)
 
   const [text, setText] = useState(window.textBotApp ? window.textBotApp: false)
   const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : false)
@@ -84,14 +84,17 @@ console.log('s')
   }, [])
 
   const eventFilter = useMemo(() => {
-    console.log('memo events')
+    if(!checked){
       return events.filter(item => item.name.toLowerCase().includes(filterEvents.toLowerCase()))
-    }, [filterEvents, events]
+    }
+      return events.filter(item => item.status === 'use').filter(item => item.name.toLowerCase().includes(filterEvents.toLowerCase()))
+    }, [filterEvents, events, checked]
   )
 
   const newEventModule = {
     idEvent: Date.now() + 'Event',
-    name: eventName, 
+    name: eventName,
+    status: 'open',
     slots:[{
       idSlot: Date.now() + 'Slot', 
       startTime: '09:00', 
@@ -123,6 +126,16 @@ console.log('s')
             </Center>
           </Grid.Col>
           <Grid.Col span={3.5}>
+          <Center>
+            <Switch
+            label={text.onlyActivEvents[leng]}
+            radius="lg"
+            color='green'
+            checked={checked}
+            onChange={(event) => {
+              setChecked(event.currentTarget.checked)
+            }}/>
+          </Center>
           </Grid.Col>
           <Grid.Col span={1.5}>
             <Center>

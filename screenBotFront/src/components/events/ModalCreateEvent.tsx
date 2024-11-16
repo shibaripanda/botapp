@@ -4,7 +4,7 @@ import { Modal, Grid, Paper, TextInput, Slider } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 import { TimeInput } from '@mantine/dates'
 
-export function ModalCreateEventPermament({text, leng, oneEvent, updateEvent}) {
+export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
 
   const [opened, { open, close }] = useDisclosure(false)
   const [editedEvent, setEditedEvent] = useState(structuredClone(oneEvent))
@@ -83,7 +83,6 @@ export function ModalCreateEventPermament({text, leng, oneEvent, updateEvent}) {
     }
   }
 
-  console.log(editedEvent.slots)
   const dayEvents = editedEvent.slots.map((item, index) => 
     <Grid.Col key={index} span={12}>
       <Paper withBorder p="lg" radius="md" shadow="md">

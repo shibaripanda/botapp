@@ -92,7 +92,7 @@ export function ScreenItem({text, leng, addContentItem, content, deleteContentIt
         <ModalCreateScreen 
           modalTitle={
             <Text c="dimmed" fz="md">
-              {`❗️⚠️ ${text.sendContentToBot[leng]} (${bot.name}) ⚠️❗️`}
+              {`❗️⚠️ ${text.sendContentToBot[leng]} (${bot.name}) ⚠️❗️ ${screen.mode}`}
             </Text>
           }
           text={text}

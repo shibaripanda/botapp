@@ -1,9 +1,9 @@
 import React from 'react'
 import { Button, Grid, Group, Paper, Text, TextInput } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
-// import { SpesialListMenu } from '../SpesialListMenu.tsx'
+import { SpesialListMenu } from '../SpesialListMenu.tsx'
 
-export function FindScreenForm({text, leng, spScreen, setSpScreen, screenFilterLength, bot, screens, createScreen, newScreenName, setNewScreenName, filterScreens, setFilterScreens}) {
+export function FindScreenForm({updateEvent, createEventScreen, events, text, leng, spScreen, setSpScreen, screenFilterLength, bot, screens, createScreen, newScreenName, setNewScreenName, filterScreens, setFilterScreens}) {
 
     const navigate = useNavigate()
 
@@ -55,16 +55,7 @@ export function FindScreenForm({text, leng, spScreen, setSpScreen, screenFilterL
                     </Button>
                 </Grid.Col>
                 <Grid.Col span={6} key={2}>
-                    {/* <SpesialListMenu spScreen={spScreen} setSpScreen={setSpScreen} activButtonCreateScreen={activButtonCreateScreen}/> */}
-                    {/* <Button variant="default" fullWidth
-                        size='xs' 
-                        disabled={activButtonCreateScreen()}
-                        onClick={() => {
-                            createScreen(newScreenName)
-                            setNewScreenName('')
-                            }}>
-                        Create special screen
-                    </Button> */}
+                    <SpesialListMenu updateEvent={updateEvent} setNewScreenName={setNewScreenName} newScreenName={newScreenName} createEventScreen={createEventScreen} events={events} text={text} leng={leng} spScreen={spScreen} setSpScreen={setSpScreen} activButtonCreateScreen={activButtonCreateScreen}/>
                 </Grid.Col>
             </Grid>
 

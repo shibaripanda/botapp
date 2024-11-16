@@ -1,18 +1,22 @@
 import { Menu, Button } from '@mantine/core';
 import React, { useState } from 'react'
 
-export function SpesialListMenu({spScreen, setSpScreen, activButtonCreateScreen}) {
+export function SpesialListMenu({updateEvent, setNewScreenName, newScreenName, createEventScreen, events, text, leng, spScreen, setSpScreen, activButtonCreateScreen}) {
 
+
+    console.log(events)
     const [opened, setOpened] = useState(false)
 
-    const menuItems = ['Sign up for the event'].map((item, index) => 
+    const menuItems = events.filter(item => item.status === 'open').map((item, index) => 
         
             <Menu.Item
                 key={index}
                 onClick={() => {
-                    setSpScreen(item)
+                    createEventScreen(newScreenName, item.idEvent)
+                    setNewScreenName('')
+                    updateEvent(item, {...item, status: 'use'})
                 }}>
-                {item}
+                {item.name}
             </Menu.Item>)
 
   return (
@@ -20,17 +24,10 @@ export function SpesialListMenu({spScreen, setSpScreen, activButtonCreateScreen}
         <Menu.Target>
             <Button variant="default" size="xs" fullWidth
             disabled={activButtonCreateScreen()}>
-                {`Create special screen`}
+                {text.createScreenEvent[leng]}
             </Button>
         </Menu.Target>
         <Menu.Dropdown>
-        {/* <Menu.Item
-            onClick={() => {
-                setActivGroup([])
-            }}>
-            All users
-        </Menu.Item> */}
-        {/* <hr></hr> */}
             {menuItems}
         </Menu.Dropdown>
     </Menu>

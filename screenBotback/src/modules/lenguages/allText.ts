@@ -84,6 +84,9 @@ export const textArray: LengData[] = [
     {rutext: 'Перерыв (минут)', index: 'pausmin', info_data: 'перерыв минут'},
     {rutext: 'Начало слота', index: 'startSlot', info_data: 'начало слота'},
     {rutext: 'Тест', index: 'test', info_data: 'тест'},
+    {rutext: 'Создать экран мероприятия', index: 'createScreenEvent', info_data: 'создать экран мероприятия'},
+    {rutext: 'Открыть', index: 'open', info_data: 'открыть'},
+    {rutext: 'Только активные мероприятия', index: 'onlyActivEvents', info_data: 'только активные мероприятия'},
     
     
 ]

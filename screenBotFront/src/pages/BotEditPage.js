@@ -23,6 +23,7 @@ export function BotEditPage() {
   const [status, setStatus] = useState(false)
   const [spScreen, setSpScreen] = useState('')
   const [content, setContent] = useState([])
+  const [events, setEvents] = useState([])
 
   const [text, setText] = useState(window.textBotApp ? window.textBotApp: false)
   const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : false)
@@ -69,7 +70,8 @@ export function BotEditPage() {
       const pipSocketListners = [
         {pip: 'getBot', handler: setBot},
         {pip: 'getScreens', handler: reverseScreens},
-        {pip: 'getContent', handler: setContent}
+        {pip: 'getContent', handler: setContent},
+        {pip: 'getEvents', handler: setEvents}
       ]
       pipGetSocket(pipSocketListners)
 
@@ -77,6 +79,7 @@ export function BotEditPage() {
       pipSendSocket('getContent', botId)
       pipSendSocket('getBot', botId)
       pipSendSocket('getScreens', botId)
+      pipSendSocket('getEvents', botId)
       setStatus(true)
       if(!text || !leng){
         console.log('update lenguage')
@@ -116,6 +119,9 @@ export function BotEditPage() {
   const createScreen = async (newScreenName) => {
     pipSendSocket('createNewScreen', {botId: bot._id, screenName: newScreenName})
   }
+  const createEventScreen = async (newScreenName, idEvent) => {
+    pipSendSocket('createEventScreen', {botId: bot._id, screenName: newScreenName, idEvent: idEvent})
+  }
   const updateVariable = async (screenId, variable) => {
     pipSendSocket('updateVariable', {botId: bot._id, screenId: screenId, variable: variable})
   }
@@ -133,6 +139,9 @@ export function BotEditPage() {
   }
   const addContentItem = async (screenId, content) => {
     pipSendSocket('addContentItem', {botId: bot._id, screenId: screenId, content: content})
+  }
+  const updateEvent = async (event, newEvent) => {
+    pipSendSocket('updateEvent', {botId: bot._id, event: event, newEvent: newEvent})
   }
 
   const loadingItem = () => {
@@ -173,12 +182,15 @@ export function BotEditPage() {
   }
 
   
-  if(bot && screens && status && text && leng){
+  if(bot && screens && status && text && leng && events){
     return (
       <div style={{width: '75vmax', marginTop: '3vmax', marginBottom: '3vmax'}}>
         <Grid justify="flex-start" align="stretch">
           <Grid.Col span={8} key={1000}>
             <FindScreenForm
+              updateEvent={updateEvent}
+              createEventScreen={createEventScreen}
+              events={events}
               text={text}
               leng={leng}
               bot={bot} 

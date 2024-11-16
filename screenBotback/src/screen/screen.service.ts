@@ -45,6 +45,22 @@ export class ScreenService {
             })
         }
 
+        async createEventScreen(botId: string, screenName: string, idEvent: string){
+            await this.botMongo.create({
+                owner: botId, 
+                name: screenName,
+                text: '',
+                media: [],
+                document: [],
+                audio: [],
+                buttons: [],
+                protect: true,
+                variable: '',
+                mode: 'event',
+                event: idEvent
+            })
+        }
+
         async copyScreen(botId: string, screenId: string){
             const screen = await this.botMongo.findOne({owner: botId, _id: screenId})
             await this.botMongo.create({

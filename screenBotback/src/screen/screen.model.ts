@@ -35,6 +35,11 @@ export const ScreenSchema = new mongoose.Schema({
       required: true,
       default: true
   },
+  mode: {
+    type: String,
+    required: true,
+    default: 'simple'
+},
   // status: {
   //     type: Boolean,
   //     required: true,
