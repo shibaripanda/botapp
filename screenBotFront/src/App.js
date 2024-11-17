@@ -4,13 +4,19 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
 import '@mantine/core/styles.layer.css'
+import '@mantine/dates/styles.css'; 
 import './layout.css'
+// import 'dayjs/locale/ru'
+// import dayjs from 'dayjs'
+// import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { ConnectPage } from './pages/ConnectPage'
 import { MainPage } from './pages/MainPage'
 import { BotEditPage } from './pages/BotEditPage'
 import { MonitPage } from './pages/MonitPage'
 import { ContentPage } from './pages/ContentPage'
 import { EventPage } from './pages/EventPage'
+
+// dayjs.extend(customParseFormat)
 
 function App() {
 

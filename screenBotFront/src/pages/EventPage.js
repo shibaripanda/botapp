@@ -23,7 +23,6 @@ export function EventPage() {
 
   const [bot, setBot] = useState(false)
   const [events, setEvents] = useState([])
-  // const [newEventName, setNewEventName] = useState('')
   const [filterEvents, setFilterEvents] = useState('')
   const [status, setStatus] = useState(false)
   const [eventName, setEventName] = useState('')
@@ -62,6 +61,11 @@ export function EventPage() {
     }
   }
 
+  const getDataLeng = async () => {
+    console.log(leng)
+    await import(`dayjs/locale/${leng}`)
+  }
+
   useEffect(() => {
     if(!sessionStorage.getItem('token')){
       window.location.assign(process.env.REACT_APP_BOTNAME)
@@ -74,12 +78,17 @@ export function EventPage() {
       pipGetSocket(pipSocketListners)
       pipSendSocket('getBot', botId)
       pipSendSocket('getEvents', botId)
-      setStatus(true)
+      if(leng){
+        getDataLeng()//.then(() => setStatus(true))
+      }
+      
       if(!text || !leng){
         console.log('update lenguage')
         getText()
-        userLenguage()
+        userLenguage().then(() => getDataLeng())
+        // getDataLeng().then(() => setStatus(true))
       }
+      setStatus(true)
     }
   }, [])
 
