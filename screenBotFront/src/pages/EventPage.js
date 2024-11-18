@@ -61,10 +61,6 @@ export function EventPage() {
     }
   }
 
-  const getDataLeng = async () => {
-    console.log(leng)
-    await import(`dayjs/locale/${leng}`)
-  }
 
   useEffect(() => {
     if(!sessionStorage.getItem('token')){
@@ -78,15 +74,11 @@ export function EventPage() {
       pipGetSocket(pipSocketListners)
       pipSendSocket('getBot', botId)
       pipSendSocket('getEvents', botId)
-      if(leng){
-        getDataLeng()//.then(() => setStatus(true))
-      }
       
       if(!text || !leng){
         console.log('update lenguage')
         getText()
-        userLenguage().then(() => getDataLeng())
-        // getDataLeng().then(() => setStatus(true))
+        userLenguage()
       }
       setStatus(true)
     }

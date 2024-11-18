@@ -7,16 +7,34 @@ import { DatePicker } from '@mantine/dates'
 
 export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
 
-  // console.log(localLeng)
-
   const [opened, { open, close }] = useDisclosure(false)
   const [editedEvent, setEditedEvent] = useState(structuredClone(oneEvent))
   const [stat, setStat] = useState(0)
   const [value, setValue] = useState<[Date | null, Date | null]>([null, null])
+  const [daysArrow, setDaysArrow] = useState<Date[]>([])
 
   useMemo(() => {
     setEditedEvent(structuredClone(oneEvent))
   }, [oneEvent])
+  useMemo(() => {
+    
+    if(value[0] && value[1]){
+      console.log('selectDays')
+      daysArrow.splice(0, daysArrow.length)
+      
+      const startTime = value[0].getTime()
+      const endTime = value[1].getTime()
+      const countDays = ((endTime - startTime) / 86400000) + 1
+
+      for(let i = 0; i < countDays; i++){
+        const x = startTime + (86400000 * i)
+        daysArrow.push(new Date(x))
+        setDaysArrow(daysArrow)
+      }
+      console.log(daysArrow.map(item => item.getDate() + '.' + (item.getMonth() + 1) + '.' + item.getFullYear()))
+    }
+
+  }, [value, daysArrow])
 
 
   const handlers = {
@@ -86,7 +104,6 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
 
     }
   }
-  console.log(value)
   const dayEvents = editedEvent.slots.map((item, index) => 
     <Grid.Col key={index} span={12}>
       <Paper withBorder p="lg" radius="md" shadow="md">
@@ -158,85 +175,82 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
     </Grid.Col>
   )
 
-  // if(status){
-    return (
-      <>
-        <Modal size={'65vmax'} opened={opened} 
-          onClose={close}
-          title={editedEvent.name}
-        >
-          <Grid>
-            <Grid.Col span={6}>
-            <TextInput
-                onChange={(event) => {
-                  editedEvent.name = event.currentTarget.value
-                  setStat(Date.now())
-                }}
-                value={editedEvent.name}
-                size="xs"
-                radius="sm"
-                label={text.eventName[leng]}
-              />
-              {/* <DatesProvider settings={{ locale: leng }}> */}
-                <DatePicker
-                locale={leng}
-                monthsListFormat="MM" 
-                size="xs" 
-                maxLevel="month" 
-                minDate={new Date(Date.now())} 
-                hideOutsideDates 
-                allowSingleDateInRange 
-                type="range" 
-                numberOfColumns={3} 
-                value={value} 
-                onChange={setValue}
-                />
-              {/* </DatesProvider> */}
-            
-            <div>{value.toString()}</div>
-            </Grid.Col>
-              {dayEvents}
-            <Grid.Col span={12}>
-              <Grid>
-                <Grid.Col span={4}>
-                  {handlers.getTimeNextEvent()}
-                </Grid.Col>
-                <Grid.Col span={2}>
-                  
-                </Grid.Col>
-                <Grid.Col span={2}>
-                  
-                </Grid.Col>
-                <Grid.Col span={2}>
-                <ButtonApp 
-                    title={text.cancel[leng]} 
-                    handler={() => {
-                      setEditedEvent(oneEvent)
-                      close()
-                    }}
-                    disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
-                  />
-                </Grid.Col>
-                <Grid.Col span={2}>
-                  <ButtonApp 
-                    title={text.save[leng]} 
-                    handler={() => updateEvent(oneEvent, editedEvent)} 
-                    disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
-                  />
-                </Grid.Col>
-              </Grid>
-            </Grid.Col>
-          </Grid>
-      
+  return (
+    <>
+      <Modal size={'65vmax'} opened={opened} 
+        onClose={close}
+        title={editedEvent.name}
+      >
 
-        </Modal>
-        <ButtonApp title={text.edit[leng]} handler={open} />
-      </>
-    )
-  // }
-  // else{
-  //   return (
-  //     <div style={{marginTop: '5vmax'}}>Loading...</div>
-  //   )
-  // }
+
+        <Grid>
+          <Grid.Col span={6}>
+            <TextInput
+              onChange={(event) => {
+                editedEvent.name = event.currentTarget.value
+                setStat(Date.now())
+              }}
+              value={editedEvent.name}
+              size="xs"
+              radius="sm"
+              label={text.eventName[leng]}
+            />
+            <hr style={{marginTop: '1vmax', marginBottom: '1vmax'}}></hr>
+            <div>Дата начало: {value[0] ? value[0].toLocaleDateString() : 'не выбрано'} </div>
+            <div>Дата окончания: {value[1] ? value[1].toLocaleDateString() : 'не выбрано'}</div>
+            <div>Длительность: {value[0] && value[1] ? (((value[1].getTime() - value[0].getTime()) / 86400000) + 1) + ' дней' : 'не установлено'}</div>
+            <hr style={{marginTop: '1vmax', marginBottom: '1vmax'}}></hr>
+            <DatePicker
+              locale={leng}
+              monthsListFormat="MM" 
+              size="xs" 
+              maxLevel="month" 
+              minDate={new Date(Date.now())} 
+              hideOutsideDates 
+              allowSingleDateInRange 
+              type="range"
+              numberOfColumns={3} 
+              value={value} 
+              onChange={setValue}
+            />
+          </Grid.Col>
+            {dayEvents}
+          <Grid.Col span={12}>
+            <Grid>
+              <Grid.Col span={4}>
+                {handlers.getTimeNextEvent()}
+              </Grid.Col>
+              <Grid.Col span={2}>
+                
+              </Grid.Col>
+              <Grid.Col span={2}>
+                
+              </Grid.Col>
+              <Grid.Col span={2}>
+              <ButtonApp 
+                  title={text.cancel[leng]} 
+                  handler={() => {
+                    setEditedEvent(oneEvent)
+                    close()
+                  }}
+                  disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
+                />
+              </Grid.Col>
+              <Grid.Col span={2}>
+                <ButtonApp 
+                  title={text.save[leng]} 
+                  handler={() => updateEvent(oneEvent, editedEvent)} 
+                  disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+        </Grid>
+    
+
+      </Modal>
+      <ButtonApp title={text.edit[leng]} handler={open} />
+    </>
+  )
+
 }
