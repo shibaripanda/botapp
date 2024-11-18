@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
-import { Modal, Grid, Paper, TextInput, Slider } from '@mantine/core'
+import { Modal, Grid, Paper, TextInput, Slider, Text, Checkbox } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 import { TimeInput } from '@mantine/dates'
 import { DatePicker } from '@mantine/dates'
@@ -11,7 +11,10 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   const [editedEvent, setEditedEvent] = useState(structuredClone(oneEvent))
   const [stat, setStat] = useState(0)
   const [value, setValue] = useState<[Date | null, Date | null]>([null, null])
+  const [disvalue, setDisValue] = useState<Date[]>([])
   const [daysArrow, setDaysArrow] = useState<Date[]>([])
+
+  const [checked, setChecked] = useState([true, false, true])
 
   useMemo(() => {
     setEditedEvent(structuredClone(oneEvent))
@@ -35,7 +38,6 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
     }
 
   }, [value, daysArrow])
-
 
   const handlers = {
     addSlot: () => {
@@ -174,6 +176,77 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
       </Paper>
     </Grid.Col>
   )
+  const excludeDays = (date) => {
+    const res: Number[] = []
+    for(const i of checked){
+      if(!i) res.push(checked.indexOf(i))
+    }
+    return res.includes(date.getDay())     // date.getDay() === 5 //|| disvalue.includes(date)
+  }
+  const dataSelect = () => {
+    return (
+      <div>
+        <Checkbox
+          checked={checked[0]}
+          onChange={(event) => {
+            checked[0] = event.currentTarget.checked
+            setChecked([...checked])
+          }}
+        />
+        <Checkbox
+          checked={checked[1]}
+          onChange={(event) => {
+            checked[1] = event.currentTarget.checked
+            setChecked([...checked])
+          }}
+        />
+        <Text>Выбери дату мероприятия или группу дат для постоянного мероприятия</Text>
+            <DatePicker
+              locale={leng}
+              monthsListFormat="MM" 
+              size="xs"
+              excludeDate={(date) => excludeDays(date)}  
+              maxLevel="month" 
+              minDate={new Date(Date.now())} 
+              hideOutsideDates 
+              allowSingleDateInRange 
+              type="range"
+              numberOfColumns={3} 
+              value={value} 
+              onChange={setValue}
+            />
+      </div>
+    )
+  }
+  const dataDeSelect = () => {
+    if(value[0] && value[1]){
+      return (
+        <div>
+          <Text>Выберите даты для исключения (пример: ваши выходные или типо того)</Text>
+          <DatePicker
+            locale={leng}
+            monthsListFormat="MM" 
+            size="xs" 
+            maxLevel="month"
+            hideOutsideDates 
+            // allowSingleDateInRange
+            excludeDate={(date) => excludeDays(date)} 
+            type="multiple"
+            numberOfColumns={3} 
+            value={disvalue} 
+            onChange={setDisValue}
+            minDate={value[0]}
+            maxDate={value[1]}
+          />
+          <ButtonApp 
+                  title={'Сохранить'} 
+                  // handler={() => updateEvent(oneEvent, editedEvent)} 
+                  // disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
+                />
+        </div>
+      )
+    }
+  }
 
   return (
     <>
@@ -181,7 +254,6 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         onClose={close}
         title={editedEvent.name}
       >
-
 
         <Grid>
           <Grid.Col span={6}>
@@ -200,19 +272,8 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
             <div>Дата окончания: {value[1] ? value[1].toLocaleDateString() : 'не выбрано'}</div>
             <div>Длительность: {value[0] && value[1] ? (((value[1].getTime() - value[0].getTime()) / 86400000) + 1) + ' дней' : 'не установлено'}</div>
             <hr style={{marginTop: '1vmax', marginBottom: '1vmax'}}></hr>
-            <DatePicker
-              locale={leng}
-              monthsListFormat="MM" 
-              size="xs" 
-              maxLevel="month" 
-              minDate={new Date(Date.now())} 
-              hideOutsideDates 
-              allowSingleDateInRange 
-              type="range"
-              numberOfColumns={3} 
-              value={value} 
-              onChange={setValue}
-            />
+            {dataSelect()}
+            {dataDeSelect()}
           </Grid.Col>
             {dayEvents}
           <Grid.Col span={12}>
