@@ -10,23 +10,23 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   const [opened, { open, close }] = useDisclosure(false)
   const [editedEvent, setEditedEvent] = useState(structuredClone(oneEvent))
   const [stat, setStat] = useState(0)
-  const [value, setValue] = useState<[Date | null, Date | null]>([null, null])
-  const [disvalue, setDisValue] = useState<Date[]>([])
+  const [dateStartPeriod, setDateStartPeriod] = useState<[Date | null, Date | null]>([null, null])
+  const [daysForDelete, setDaysForDelete] = useState<Date[]>([])
   const [daysArrow, setDaysArrow] = useState<Date[]>([])
 
-  const [checked, setChecked] = useState([true, false, true])
+  const [checked, setChecked] = useState([0 ,1, 2, 3, 4, 5, 6])
 
   useMemo(() => {
     setEditedEvent(structuredClone(oneEvent))
   }, [oneEvent])
   useMemo(() => {
     
-    if(value[0] && value[1]){
+    if(dateStartPeriod[0] && dateStartPeriod[1]){
       console.log('selectDays')
       daysArrow.splice(0, daysArrow.length)
       
-      const startTime = value[0].getTime()
-      const endTime = value[1].getTime()
+      const startTime = dateStartPeriod[0].getTime()
+      const endTime = dateStartPeriod[1].getTime()
       const countDays = ((endTime - startTime) / 86400000) + 1
 
       for(let i = 0; i < countDays; i++){
@@ -37,7 +37,18 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
       console.log(daysArrow.map(item => item.getDate() + '.' + (item.getMonth() + 1) + '.' + item.getFullYear()))
     }
 
-  }, [value, daysArrow])
+  }, [dateStartPeriod, daysArrow])
+  useMemo(() => {
+    console.log(daysForDelete)
+  }, [daysForDelete])
+
+  // const red = useMemo((date) => {
+  //     console.log(daysForDelete)
+  //     console.log(date)
+  //     console.log(daysForDelete.includes(date))
+  //     return !checked.includes(date.getDay()) || daysForDelete.includes(date)
+  //   }, [checked]
+  // )
 
   const handlers = {
     addSlot: () => {
@@ -176,74 +187,161 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
       </Paper>
     </Grid.Col>
   )
+  const filterDays = () => {
+    return (
+      <Grid>
+        {checked.map((item, index) => 
+          <Grid.Col span={1.5} key={index}>
+              <Checkbox
+              label={text[`day${index}`][leng].substring(0, 3)}
+              checked={checked.includes(index)}
+              onChange={(event) => {
+                if(event.currentTarget.checked){
+                  checked[index] = index
+                }
+                else{
+                  checked[index] = 9
+                }
+                setChecked([...checked])
+              }}
+            />
+          </Grid.Col>)}
+      </Grid>
+    )
+  }
+
+  const daySlotsEdition = () => {
+    return (
+
+          <Paper withBorder p="lg" radius="md" shadow="md" style={{marginTop: '2vmax', marginBottom: '2vmax'}}>
+            <Grid>
+              {dayEvents}
+              <Grid.Col span={3} style={{marginTop: '1vmax'}}>
+                {handlers.getTimeNextEvent()}
+              </Grid.Col>
+            </Grid>
+          </Paper>
+    )
+  }
+  const titleData = () => {
+    return (
+      <Grid>
+        <Grid.Col span={6}>
+          <TextInput
+            onChange={(event) => {
+              editedEvent.name = event.currentTarget.value
+              setStat(Date.now())
+            }}
+            value={editedEvent.name}
+            size="xs"
+            radius="sm"
+            label={text.eventName[leng]}
+            style={{marginBottom: '1vmax'}}
+          />
+          <div>
+            {dateStartPeriod[0] ? dateStartPeriod[0].toLocaleDateString() : ''} {' - '}
+            {dateStartPeriod[1] ? dateStartPeriod[1].toLocaleDateString() : ''} {' - '}
+            ({(dateStartPeriod[0] && dateStartPeriod[1] ? (((dateStartPeriod[1].getTime() - dateStartPeriod[0].getTime()) / 86400000) + 1) : '')})
+            </div>
+          <hr style={{marginTop: '1vmax', marginBottom: '1vmax'}}></hr>
+        </Grid.Col>
+      </Grid>
+    )
+  }
   const excludeDays = (date) => {
-    const res: Number[] = []
-    for(const i of checked){
-      if(!i) res.push(checked.indexOf(i))
-    }
-    return res.includes(date.getDay())     // date.getDay() === 5 //|| disvalue.includes(date)
+    return !checked.includes(date.getDay())
+  }
+  const excludeDaysReady = (date) => {
+    // const check = (day) => {
+    //   for(const i of daysArrow){
+    //     if(daysForDelete.includes(i)){
+    //       return false
+    //     }
+    //     return true
+    //   }
+    // }
+    console.log(daysForDelete)
+    console.log(date)
+    console.log(daysForDelete.includes(date))
+    return !checked.includes(date.getDay()) || daysArrow.includes(date)
   }
   const dataSelect = () => {
     return (
-      <div>
-        <Checkbox
-          checked={checked[0]}
-          onChange={(event) => {
-            checked[0] = event.currentTarget.checked
-            setChecked([...checked])
-          }}
-        />
-        <Checkbox
-          checked={checked[1]}
-          onChange={(event) => {
-            checked[1] = event.currentTarget.checked
-            setChecked([...checked])
-          }}
-        />
+      <Paper withBorder p="lg" radius="md" shadow="md" style={{marginTop: '2vmax', marginBottom: '2vmax'}}>
         <Text>Выбери дату мероприятия или группу дат для постоянного мероприятия</Text>
-            <DatePicker
-              locale={leng}
-              monthsListFormat="MM" 
-              size="xs"
-              excludeDate={(date) => excludeDays(date)}  
-              maxLevel="month" 
-              minDate={new Date(Date.now())} 
-              hideOutsideDates 
-              allowSingleDateInRange 
-              type="range"
-              numberOfColumns={3} 
-              value={value} 
-              onChange={setValue}
-            />
-      </div>
+        <div style={{marginTop: '1vmax', marginBottom: '1vmax'}}>
+          {filterDays()}
+        </div>
+        <DatePicker
+          locale={leng}
+          monthsListFormat="MM" 
+          size="xs"
+          excludeDate={(date) => excludeDays(date)}  
+          maxLevel="month" 
+          minDate={new Date(Date.now())} 
+          hideOutsideDates 
+          allowSingleDateInRange 
+          type="range"
+          numberOfColumns={3} 
+          value={dateStartPeriod} 
+          onChange={setDateStartPeriod}
+        />
+      </Paper>
     )
   }
   const dataDeSelect = () => {
-    if(value[0] && value[1]){
+    if(dateStartPeriod[0] && dateStartPeriod[1]){
       return (
-        <div>
+        <Paper withBorder p="lg" radius="md" shadow="md" style={{marginTop: '2vmax', marginBottom: '2vmax'}}>
           <Text>Выберите даты для исключения (пример: ваши выходные или типо того)</Text>
           <DatePicker
             locale={leng}
             monthsListFormat="MM" 
             size="xs" 
             maxLevel="month"
-            hideOutsideDates 
-            // allowSingleDateInRange
+            hideOutsideDates
             excludeDate={(date) => excludeDays(date)} 
             type="multiple"
             numberOfColumns={3} 
-            value={disvalue} 
-            onChange={setDisValue}
-            minDate={value[0]}
-            maxDate={value[1]}
+            value={daysForDelete} 
+            onChange={setDaysForDelete}
+            minDate={dateStartPeriod[0]}
+            maxDate={dateStartPeriod[1]}
           />
           <ButtonApp 
                   title={'Сохранить'} 
                   // handler={() => updateEvent(oneEvent, editedEvent)} 
                   // disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
                 />
-        </div>
+        </Paper>
+      )
+    }
+  }
+  const readySelect = () => {
+    if(dateStartPeriod[0] && dateStartPeriod[1]){
+      return (
+        <Paper withBorder p="lg" radius="md" shadow="md" style={{marginTop: '2vmax', marginBottom: '2vmax'}}>
+          <Text>Детальный редактор дней</Text>
+          <DatePicker
+            locale={leng}
+            monthsListFormat="MM" 
+            size="xs" 
+            maxLevel="month"
+            hideOutsideDates
+            excludeDate={(date) => excludeDaysReady(date)} 
+            type="multiple"
+            numberOfColumns={3} 
+            // value={daysForDelete} 
+            // onChange={setDaysForDelete}
+            minDate={dateStartPeriod[0]}
+            maxDate={dateStartPeriod[1]}
+          />
+          <ButtonApp 
+                  title={'Сохранить'} 
+                  // handler={() => updateEvent(oneEvent, editedEvent)} 
+                  // disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
+                />
+        </Paper>
       )
     }
   }
@@ -254,61 +352,34 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         onClose={close}
         title={editedEvent.name}
       >
+      <>
 
+        {titleData()}
+        {dataSelect()}
+        {dataDeSelect()}
+        {readySelect()}
+        {daySlotsEdition()}
         <Grid>
-          <Grid.Col span={6}>
-            <TextInput
-              onChange={(event) => {
-                editedEvent.name = event.currentTarget.value
-                setStat(Date.now())
+          <Grid.Col span={2}>
+          <ButtonApp 
+              title={text.cancel[leng]} 
+              handler={() => {
+                setEditedEvent(oneEvent)
+                close()
               }}
-              value={editedEvent.name}
-              size="xs"
-              radius="sm"
-              label={text.eventName[leng]}
+              disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
             />
-            <hr style={{marginTop: '1vmax', marginBottom: '1vmax'}}></hr>
-            <div>Дата начало: {value[0] ? value[0].toLocaleDateString() : 'не выбрано'} </div>
-            <div>Дата окончания: {value[1] ? value[1].toLocaleDateString() : 'не выбрано'}</div>
-            <div>Длительность: {value[0] && value[1] ? (((value[1].getTime() - value[0].getTime()) / 86400000) + 1) + ' дней' : 'не установлено'}</div>
-            <hr style={{marginTop: '1vmax', marginBottom: '1vmax'}}></hr>
-            {dataSelect()}
-            {dataDeSelect()}
           </Grid.Col>
-            {dayEvents}
-          <Grid.Col span={12}>
-            <Grid>
-              <Grid.Col span={4}>
-                {handlers.getTimeNextEvent()}
-              </Grid.Col>
-              <Grid.Col span={2}>
-                
-              </Grid.Col>
-              <Grid.Col span={2}>
-                
-              </Grid.Col>
-              <Grid.Col span={2}>
-              <ButtonApp 
-                  title={text.cancel[leng]} 
-                  handler={() => {
-                    setEditedEvent(oneEvent)
-                    close()
-                  }}
-                  disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
-                />
-              </Grid.Col>
-              <Grid.Col span={2}>
-                <ButtonApp 
-                  title={text.save[leng]} 
-                  handler={() => updateEvent(oneEvent, editedEvent)} 
-                  disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
-                />
-              </Grid.Col>
-            </Grid>
+          <Grid.Col span={2}>
+            <ButtonApp 
+              title={text.save[leng]} 
+              handler={() => updateEvent(oneEvent, editedEvent)} 
+              disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
+            />
           </Grid.Col>
         </Grid>
-    
 
+      </>
       </Modal>
       <ButtonApp title={text.edit[leng]} handler={open} />
     </>

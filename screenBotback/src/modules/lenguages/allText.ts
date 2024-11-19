@@ -87,6 +87,13 @@ export const textArray: LengData[] = [
     {rutext: 'Создать экран мероприятия', index: 'createScreenEvent', info_data: 'создать экран мероприятия'},
     {rutext: 'Открыть', index: 'open', info_data: 'открыть'},
     {rutext: 'Только активные мероприятия', index: 'onlyActivEvents', info_data: 'только активные мероприятия'},
+    {rutext: 'Понедельник', index: 'day1', info_data: 'понедельник'},
+    {rutext: 'Вторник', index: 'day2', info_data: 'вторник'},
+    {rutext: 'Среда', index: 'day3', info_data: 'среда'},
+    {rutext: 'Четверг', index: 'day4', info_data: 'четверг'},
+    {rutext: 'Пятница', index: 'day5', info_data: 'пятница'},
+    {rutext: 'Суббота', index: 'day6', info_data: 'суббота'},
+    {rutext: 'Воскресенье', index: 'day0', info_data: 'воскресенье'},
     
     
 ]
