@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
-import { Modal, Grid, Paper, TextInput, Slider, Text, Checkbox } from '@mantine/core'
+import { Modal, Grid, Paper, TextInput, Slider, Text, Checkbox, Accordion } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 import { TimeInput } from '@mantine/dates'
 import { DatePicker } from '@mantine/dates'
@@ -13,6 +13,8 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   const [dateStartPeriod, setDateStartPeriod] = useState<[Date | null, Date | null]>([null, null])
   const [daysForDelete, setDaysForDelete] = useState<Date[]>([])
   const [daysArrow, setDaysArrow] = useState<Date[]>([])
+
+  const [currentEditDays, setCurrentEditDays] = useState<Date[]>([])
 
   const [checked, setChecked] = useState([0 ,1, 2, 3, 4, 5, 6])
 
@@ -38,17 +40,6 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
     }
 
   }, [dateStartPeriod, daysArrow])
-  useMemo(() => {
-    console.log(daysForDelete)
-  }, [daysForDelete])
-
-  // const red = useMemo((date) => {
-  //     console.log(daysForDelete)
-  //     console.log(date)
-  //     console.log(daysForDelete.includes(date))
-  //     return !checked.includes(date.getDay()) || daysForDelete.includes(date)
-  //   }, [checked]
-  // )
 
   const handlers = {
     addSlot: () => {
@@ -203,6 +194,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                   checked[index] = 9
                 }
                 setChecked([...checked])
+                setCurrentEditDays([])
               }}
             />
           </Grid.Col>)}
@@ -211,22 +203,33 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   }
 
   const daySlotsEdition = () => {
-    return (
-
+    if(currentEditDays.length){
+      return (
           <Paper withBorder p="lg" radius="md" shadow="md" style={{marginTop: '2vmax', marginBottom: '2vmax'}}>
             <Grid>
+              <Grid.Col span={10} style={{marginTop: '1vmax'}}>
+                {currentEditDays.map(item => item.getDate() + '.' + (item.getMonth() + 1) + '.' + item.getFullYear() + ', ')}
+              </Grid.Col>
+              <Grid.Col span={2} style={{marginTop: '1vmax'}}>
+              <ButtonApp 
+                title={text.save[leng]} 
+                handler={() => updateEvent(oneEvent, editedEvent)} 
+                disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
+              />
+              </Grid.Col>
               {dayEvents}
               <Grid.Col span={3} style={{marginTop: '1vmax'}}>
                 {handlers.getTimeNextEvent()}
               </Grid.Col>
             </Grid>
           </Paper>
-    )
+      )
+    }
   }
   const titleData = () => {
     return (
       <Grid>
-        <Grid.Col span={6}>
+        <Grid.Col span={4}>
           <TextInput
             onChange={(event) => {
               editedEvent.name = event.currentTarget.value
@@ -235,113 +238,117 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
             value={editedEvent.name}
             size="xs"
             radius="sm"
-            label={text.eventName[leng]}
             style={{marginBottom: '1vmax'}}
           />
+          </Grid.Col>
+          <Grid.Col span={4}>
           <div>
             {dateStartPeriod[0] ? dateStartPeriod[0].toLocaleDateString() : ''} {' - '}
             {dateStartPeriod[1] ? dateStartPeriod[1].toLocaleDateString() : ''} {' - '}
             ({(dateStartPeriod[0] && dateStartPeriod[1] ? (((dateStartPeriod[1].getTime() - dateStartPeriod[0].getTime()) / 86400000) + 1) : '')})
             </div>
-          <hr style={{marginTop: '1vmax', marginBottom: '1vmax'}}></hr>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <ButtonApp 
+              title={text.cancel[leng]} 
+              handler={() => {
+                setEditedEvent(oneEvent)
+                close()
+              }}
+              disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
+            />
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <ButtonApp 
+              title={text.save[leng]} 
+              handler={() => updateEvent(oneEvent, editedEvent)} 
+              disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
+            />
         </Grid.Col>
       </Grid>
     )
   }
-  const excludeDays = (date) => {
-    return !checked.includes(date.getDay())
-  }
-  const excludeDaysReady = (date) => {
-    // const check = (day) => {
-    //   for(const i of daysArrow){
-    //     if(daysForDelete.includes(i)){
-    //       return false
-    //     }
-    //     return true
-    //   }
-    // }
-    console.log(daysForDelete)
-    console.log(date)
-    console.log(daysForDelete.includes(date))
-    return !checked.includes(date.getDay()) || daysArrow.includes(date)
-  }
   const dataSelect = () => {
     return (
-      <Paper withBorder p="lg" radius="md" shadow="md" style={{marginTop: '2vmax', marginBottom: '2vmax'}}>
-        <Text>Выбери дату мероприятия или группу дат для постоянного мероприятия</Text>
-        <div style={{marginTop: '1vmax', marginBottom: '1vmax'}}>
-          {filterDays()}
-        </div>
-        <DatePicker
-          locale={leng}
-          monthsListFormat="MM" 
-          size="xs"
-          excludeDate={(date) => excludeDays(date)}  
-          maxLevel="month" 
-          minDate={new Date(Date.now())} 
-          hideOutsideDates 
-          allowSingleDateInRange 
-          type="range"
-          numberOfColumns={3} 
-          value={dateStartPeriod} 
-          onChange={setDateStartPeriod}
-        />
-      </Paper>
+        <Accordion.Item value="1">
+          <Accordion.Control><Text>STEP 1 Выбери дату мероприятия или группу дат для постоянного мероприятия</Text></Accordion.Control>
+          <Accordion.Panel>
+            <DatePicker
+              locale={leng}
+              monthsListFormat="MM" 
+              size="xs"
+              excludeDate={(date) => !checked.includes(date.getDay())}  
+              maxLevel="month" 
+              minDate={new Date(Date.now())} 
+              hideOutsideDates 
+              allowSingleDateInRange 
+              type="range"
+              numberOfColumns={3} 
+              value={dateStartPeriod} 
+              onChange={(value) => {
+                setDateStartPeriod(value)
+                setCurrentEditDays([])
+              }}
+            />
+            <hr></hr>
+            <div style={{marginTop: '1vmax', marginBottom: '1vmax'}}>
+              {filterDays()}
+            </div>
+          </Accordion.Panel>
+        </Accordion.Item>
     )
   }
   const dataDeSelect = () => {
     if(dateStartPeriod[0] && dateStartPeriod[1]){
       return (
-        <Paper withBorder p="lg" radius="md" shadow="md" style={{marginTop: '2vmax', marginBottom: '2vmax'}}>
-          <Text>Выберите даты для исключения (пример: ваши выходные или типо того)</Text>
-          <DatePicker
-            locale={leng}
-            monthsListFormat="MM" 
-            size="xs" 
-            maxLevel="month"
-            hideOutsideDates
-            excludeDate={(date) => excludeDays(date)} 
-            type="multiple"
-            numberOfColumns={3} 
-            value={daysForDelete} 
-            onChange={setDaysForDelete}
-            minDate={dateStartPeriod[0]}
-            maxDate={dateStartPeriod[1]}
-          />
-          <ButtonApp 
-                  title={'Сохранить'} 
-                  // handler={() => updateEvent(oneEvent, editedEvent)} 
-                  // disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
-                />
-        </Paper>
+          <Accordion.Item value="2">
+            <Accordion.Control><Text>STEP 2 Выберите даты для исключения (пример: ваши выходные или типо того)</Text></Accordion.Control>
+            <Accordion.Panel>
+              <DatePicker
+                locale={leng}
+                monthsListFormat="MM" 
+                size="xs" 
+                maxLevel="month"
+                hideOutsideDates      
+                excludeDate={(date) => !checked.includes(date.getDay())} 
+                type="multiple"
+                numberOfColumns={3} 
+                value={daysForDelete}
+                onChange={(value) => {
+                  setDaysForDelete(value)
+                  setCurrentEditDays([])
+                }}
+                minDate={dateStartPeriod[0]}
+                maxDate={dateStartPeriod[1]}
+              />
+          </Accordion.Panel>
+        </Accordion.Item>
       )
     }
   }
   const readySelect = () => {
     if(dateStartPeriod[0] && dateStartPeriod[1]){
       return (
-        <Paper withBorder p="lg" radius="md" shadow="md" style={{marginTop: '2vmax', marginBottom: '2vmax'}}>
-          <Text>Детальный редактор дней</Text>
-          <DatePicker
-            locale={leng}
-            monthsListFormat="MM" 
-            size="xs" 
-            maxLevel="month"
-            hideOutsideDates
-            excludeDate={(date) => excludeDaysReady(date)} 
-            type="multiple"
-            numberOfColumns={3} 
-            // value={daysForDelete} 
-            // onChange={setDaysForDelete}
-            minDate={dateStartPeriod[0]}
-            maxDate={dateStartPeriod[1]}
-          />
-          <ButtonApp 
-                  title={'Сохранить'} 
-                  // handler={() => updateEvent(oneEvent, editedEvent)} 
-                  // disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
-                />
-        </Paper>
+          <Accordion.Item value="3">
+            <Accordion.Control><Text>STEP 3 Детальный редактор дней</Text></Accordion.Control>
+            <Accordion.Panel>
+              <DatePicker
+                locale={leng}
+                monthsListFormat="MM" 
+                size="xs" 
+                maxLevel="month"
+                hideOutsideDates
+                excludeDate={(date) => daysForDelete.map(item => item.getTime()).includes(date.getTime()) || !checked.includes(date.getDay())} 
+                type="multiple"
+                numberOfColumns={3} 
+                value={currentEditDays} 
+                onChange={setCurrentEditDays}
+                minDate={dateStartPeriod[0]}
+                maxDate={dateStartPeriod[1]}
+              />
+              {daySlotsEdition()}
+          </Accordion.Panel>
+          </Accordion.Item>
       )
     }
   }
@@ -355,29 +362,11 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
       <>
 
         {titleData()}
-        {dataSelect()}
-        {dataDeSelect()}
+        <Accordion variant="separated">
         {readySelect()}
-        {daySlotsEdition()}
-        <Grid>
-          <Grid.Col span={2}>
-          <ButtonApp 
-              title={text.cancel[leng]} 
-              handler={() => {
-                setEditedEvent(oneEvent)
-                close()
-              }}
-              disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
-            />
-          </Grid.Col>
-          <Grid.Col span={2}>
-            <ButtonApp 
-              title={text.save[leng]} 
-              handler={() => updateEvent(oneEvent, editedEvent)} 
-              disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
-            />
-          </Grid.Col>
-        </Grid>
+        {dataDeSelect()}
+        {dataSelect()}
+        </Accordion>
 
       </>
       </Modal>
