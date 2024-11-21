@@ -358,11 +358,11 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
           </>
         )
       }
-      else{
-        return (
-          <>{text.oneDayEvent[leng]}</>
-        )
-      }
+      // else{
+      //   return (
+      //     <>{text.oneDayEvent[leng]}</>
+      //   )
+      // }
     }
   }
 
@@ -439,29 +439,29 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
     )
   }
   const dataDeSelect = () => {
-    if(dateStartPeriod[0] && dateStartPeriod[1]){
+    // if(dateStartPeriod[0] && dateStartPeriod[1]){
       return (
           <Accordion.Item value="2">
-            <Accordion.Control><Text>{text.step[leng]} 2 {text.weekends[leng]}</Text></Accordion.Control>
+            <Accordion.Control disabled={(!dateStartPeriod[0] || !dateStartPeriod[1]) || daysArrow.length === 1}><Text>{text.step[leng]} 2 {text.weekends[leng]}</Text></Accordion.Control>
             <Accordion.Panel>
             {handlers.editOneMultiEventDis()}
           </Accordion.Panel>
         </Accordion.Item>
       )
-    }
+    // }
   }
   const readySelect = () => {
-    if(dateStartPeriod[0] && dateStartPeriod[1]){
+    // if(dateStartPeriod[0] && dateStartPeriod[1]){
       return (
           <Accordion.Item value="3">
-            <Accordion.Control><Text>{text.step[leng]} 3 {text.daysEdit[leng]}</Text></Accordion.Control>
+            <Accordion.Control disabled={!dateStartPeriod[0] || !dateStartPeriod[1]}><Text>{text.step[leng]} 3 {text.daysEdit[leng]}</Text></Accordion.Control>
             <Accordion.Panel>
               {handlers.editOneMultiEvent()}
               {handlers.daySlotsEdition()}
           </Accordion.Panel>
           </Accordion.Item>
       )
-    }
+    // }
   }
 
   return (
