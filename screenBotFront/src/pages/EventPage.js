@@ -96,15 +96,16 @@ export function EventPage() {
     idEvent: Date.now() + 'Event',
     name: eventName,
     status: 'open',
-    slots:[{
-      idSlot: Date.now() + 'Slot', 
-      startTime: '09:00', 
-      duration: 45, 
-      break: 15, 
-      clients: [], 
-      maxClients: 1,
-      openForRegistration: true
-    }]
+    days: [],
+    // slots:[{
+    //   idSlot: Date.now() + 'Slot', 
+    //   startTime: '09:00', 
+    //   duration: 45, 
+    //   break: 15, 
+    //   clients: [], 
+    //   maxClients: 1,
+    //   openForRegistration: true
+    // }]
   }
   
   const func = {

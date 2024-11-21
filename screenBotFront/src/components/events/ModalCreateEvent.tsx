@@ -19,6 +19,16 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   const [checkedAll, setCheckedAll] = useState(false)
   const [referensDay, setReferensDay] = useState<Date | false>(false)
 
+  interface Slots {
+    idSlot: string, 
+    startTime: string, 
+    duration: number, 
+    break: number, 
+    clients: [], 
+    maxClients: number,
+    openForRegistration: boolean
+  }
+
   useMemo(() => {
     setEditedEvent(structuredClone(oneEvent))
   }, [oneEvent])
@@ -143,7 +153,6 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         }
       }
       if(currentEditDays.length){
-        // setReferensDay(currentEditDays[0])
         return (
             <Paper withBorder p="lg" radius="md" shadow="md" style={{marginTop: '2vmax', marginBottom: '2vmax'}}>
               <Grid>
@@ -161,7 +170,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                   </Grid>
                 </Grid.Col>
                 <Grid.Col span={12} style={{marginTop: '1vmax'}}>
-                  {handlers.dayEvents}
+                  {handlers.dayEvents(referensDay)}
                 </Grid.Col>
                 <Grid.Col span={3} style={{marginTop: '1vmax'}}>
                   {handlers.getTimeNextEvent()}
@@ -180,7 +189,24 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         )
       }
     },
-    dayEvents: editedEvent.slots.map((item, index) => 
+    dayEvents: (day) => {
+      const existDay = editedEvent.days.findItem(item => item.day.getTime() === day.getTime())
+      let editedSlots: Slots[]
+      if(existDay && existDay.slots.length){
+        editedSlots = existDay.slots
+      }
+      else{
+        editedSlots = [{
+            idSlot: Date.now() + 'Slot', 
+            startTime: '09:00', 
+            duration: 45, 
+            break: 15, 
+            clients: [], 
+            maxClients: 1,
+            openForRegistration: true
+          }]
+      }
+      return editedSlots.map((item, index) => 
       <Grid.Col key={index} span={12}>
         <Paper withBorder p="lg" radius="md" shadow="md">
           <Grid align="flex-end">
@@ -248,8 +274,8 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
             </Grid.Col>
           </Grid>
         </Paper>
-      </Grid.Col>
-    ),
+      </Grid.Col>)
+    },
     filterDaysEditDays: () => {
       return (
         <Grid>
@@ -303,15 +329,14 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                   if(value.length === daysArrow.length){
                     setCheckedAll(true)
                   }
-                  console.log(value.length === daysArrow.length)
-                  console.log(value.length)
-                  console.log(daysArrow.length)
                   setCurrentEditDays(value)
                 }}
                 minDate={dateStartPeriod[0]}
                 maxDate={dateStartPeriod[1]}
               />
-            {handlers.filterDaysEditDays()}
+              <div style={{marginTop: '1vmax'}}>
+                {handlers.filterDaysEditDays()}
+              </div>
               <div style={{marginTop: '1vmax'}}>
                 <Checkbox
                   label={text.selectAll[leng]}
@@ -430,7 +455,6 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                 setCurrentEditDays([])
               }}
             />
-            {/* <hr></hr> */}
             <div style={{marginTop: '1vmax', marginBottom: '1vmax'}}>
               {handlers.filterDays()}
             </div>
@@ -439,29 +463,25 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
     )
   }
   const dataDeSelect = () => {
-    // if(dateStartPeriod[0] && dateStartPeriod[1]){
-      return (
-          <Accordion.Item value="2">
-            <Accordion.Control disabled={(!dateStartPeriod[0] || !dateStartPeriod[1]) || daysArrow.length === 1}><Text>{text.step[leng]} 2 {text.weekends[leng]}</Text></Accordion.Control>
-            <Accordion.Panel>
-            {handlers.editOneMultiEventDis()}
-          </Accordion.Panel>
-        </Accordion.Item>
-      )
-    // }
+    return (
+        <Accordion.Item value="2">
+          <Accordion.Control disabled={(!dateStartPeriod[0] || !dateStartPeriod[1]) || daysArrow.length === 1}><Text>{text.step[leng]} 2 {text.weekends[leng]}</Text></Accordion.Control>
+          <Accordion.Panel>
+          {handlers.editOneMultiEventDis()}
+        </Accordion.Panel>
+      </Accordion.Item>
+    )
   }
   const readySelect = () => {
-    // if(dateStartPeriod[0] && dateStartPeriod[1]){
-      return (
-          <Accordion.Item value="3">
-            <Accordion.Control disabled={!dateStartPeriod[0] || !dateStartPeriod[1]}><Text>{text.step[leng]} 3 {text.daysEdit[leng]}</Text></Accordion.Control>
-            <Accordion.Panel>
-              {handlers.editOneMultiEvent()}
-              {handlers.daySlotsEdition()}
-          </Accordion.Panel>
-          </Accordion.Item>
-      )
-    // }
+    return (
+        <Accordion.Item value="3">
+          <Accordion.Control disabled={!dateStartPeriod[0] || !dateStartPeriod[1]}><Text>{text.step[leng]} 3 {text.daysEdit[leng]}</Text></Accordion.Control>
+          <Accordion.Panel>
+            {handlers.editOneMultiEvent()}
+            {handlers.daySlotsEdition()}
+        </Accordion.Panel>
+        </Accordion.Item>
+    )
   }
 
   return (
