@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
-import { Modal, Grid, Paper, TextInput, Slider, Text, Checkbox, Accordion } from '@mantine/core'
+import { Modal, Grid, Paper, TextInput, Slider, Text, Checkbox, Accordion, Button } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 import { TimeInput } from '@mantine/dates'
 import { DatePicker } from '@mantine/dates'
@@ -17,11 +17,17 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   const [checked, setChecked] = useState([0 ,1, 2, 3, 4, 5, 6])
   const [checkedEdit, setCheckedEdit] = useState([9 ,9, 9, 9, 9, 9, 9])
   const [checkedAll, setCheckedAll] = useState(false)
+  const [referensDay, setReferensDay] = useState<Date | false>(false)
 
   useMemo(() => {
     setEditedEvent(structuredClone(oneEvent))
   }, [oneEvent])
   useMemo(() => {
+
+    setCheckedEdit([9 ,9, 9, 9, 9, 9, 9])
+    setReferensDay(false)
+    setCheckedAll(false)
+
     if(dateStartPeriod[0] && dateStartPeriod[1]){
       const result: Date[] = []
       const startTime = dateStartPeriod[0].getTime()
@@ -34,8 +40,8 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
       setDaysArrow(res)
       if(res.length === 1){
         setCurrentEditDays(res)
+        setReferensDay(res[0])
       }
-      // console.log(res.map(item => item.getDate() + '.' + (item.getMonth() + 1) + '.' + item.getFullYear()))
     }
 
   }, [dateStartPeriod, checked, daysForDelete])
@@ -131,29 +137,43 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
       )
     },
     daySlotsEdition: () => {
-      if(currentEditDays.length){
-        const oneOrMulti = () => {
-          if(currentEditDays.length > 1){
-            return ', '
-          }
-          return ''
+      const colorEdit = (time) => {
+        if(referensDay && time.getTime() === referensDay.getTime()){
+          return 'green'
         }
+      }
+      if(currentEditDays.length){
+        // setReferensDay(currentEditDays[0])
         return (
             <Paper withBorder p="lg" radius="md" shadow="md" style={{marginTop: '2vmax', marginBottom: '2vmax'}}>
               <Grid>
-                <Grid.Col span={10} style={{marginTop: '1vmax'}}>
-                  {currentEditDays.map(item => item.getDate() + '.' + (item.getMonth() + 1) + '.' + item.getFullYear() + oneOrMulti())}
+                <Grid.Col span={12} style={{marginTop: '1vmax'}}>
+                  <Grid>
+                    {currentEditDays.map((item, index) =>
+                      <Grid.Col span={1.7} key={index}>
+                        <ButtonApp 
+                          title={item.getDate() + '.' + (item.getMonth() + 1) + '.' + item.getFullYear()}
+                          handler={() => setReferensDay(item)} 
+                          color={colorEdit(item)}
+                        />
+                      </Grid.Col>
+                    )}
+                  </Grid>
                 </Grid.Col>
-                <Grid.Col span={2} style={{marginTop: '1vmax'}}>
-                <ButtonApp 
-                  title={text.save[leng]} 
-                  handler={() => updateEvent(oneEvent, editedEvent)} 
-                  disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
-                />
+                <Grid.Col span={12} style={{marginTop: '1vmax'}}>
+                  {handlers.dayEvents}
                 </Grid.Col>
-                {handlers.dayEvents}
                 <Grid.Col span={3} style={{marginTop: '1vmax'}}>
                   {handlers.getTimeNextEvent()}
+                </Grid.Col>
+                <Grid.Col span={7} style={{marginTop: '1vmax'}}>
+                </Grid.Col>
+                <Grid.Col span={2} style={{marginTop: '1vmax'}}>
+                  <ButtonApp 
+                    title={text.save[leng]} 
+                    handler={() => updateEvent(oneEvent, editedEvent)} 
+                    disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
+                  />
                 </Grid.Col>
               </Grid>
             </Paper>
@@ -236,7 +256,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
           {checkedEdit.map((item, index) => 
             <Grid.Col span={1.5} key={index}>
                 <Checkbox
-                disabled={!checked.includes(index)}
+                disabled={!checked.includes(index) || !daysArrow.map(item => item.getDay()).includes(index)}
                 label={text[`day${index}`][leng].substring(0, 3)}
                 checked={checkedEdit.includes(index)}
                 onChange={(event) => {
@@ -245,6 +265,9 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                   }
                   else{
                     checkedEdit[index] = 9
+                    if(referensDay && referensDay.getDay() === index){
+                      setReferensDay(false)
+                    }
                   }
                   setCheckedEdit([...checkedEdit])
                   setCheckedAll(false)
@@ -270,14 +293,28 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                 type="multiple"
                 numberOfColumns={3} 
                 value={currentEditDays} 
-                onChange={setCurrentEditDays}
+                onChange={(value) => {
+                  if(referensDay && !value.map(item => item.getTime()).includes(referensDay.getTime())){
+                    setReferensDay(false)
+                  }
+                  if(value.length !== currentEditDays.length){
+                    setCheckedAll(false)
+                  }
+                  if(value.length === daysArrow.length){
+                    setCheckedAll(true)
+                  }
+                  console.log(value.length === daysArrow.length)
+                  console.log(value.length)
+                  console.log(daysArrow.length)
+                  setCurrentEditDays(value)
+                }}
                 minDate={dateStartPeriod[0]}
                 maxDate={dateStartPeriod[1]}
               />
             {handlers.filterDaysEditDays()}
               <div style={{marginTop: '1vmax'}}>
                 <Checkbox
-                  label={'Select all days'}
+                  label={text.selectAll[leng]}
                   checked={checkedAll}
                   onChange={(event) => {
                     setCheckedAll(event.currentTarget.checked)
@@ -286,6 +323,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                       setCheckedEdit([0 ,1, 2, 3, 4, 5, 6])
                     }
                     else{
+                      setReferensDay(false)
                       setCurrentEditDays([])
                       setCheckedEdit([9 ,9, 9, 9, 9, 9, 9])
                     }
@@ -322,7 +360,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
       }
       else{
         return (
-          <>Для мероприятия в один день, данный шаг не требуется</>
+          <>{text.oneDayEvent[leng]}</>
         )
       }
     }
@@ -373,7 +411,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   const dataSelect = () => {
     return (
         <Accordion.Item value="1">
-          <Accordion.Control><Text>STEP 1 Выбери дату мероприятия или группу дат для постоянного мероприятия</Text></Accordion.Control>
+          <Accordion.Control><Text>{text.step[leng]} 1 {text.daysOrPeriod[leng]}</Text></Accordion.Control>
           <Accordion.Panel>
             <DatePicker
               locale={leng}
@@ -404,7 +442,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
     if(dateStartPeriod[0] && dateStartPeriod[1]){
       return (
           <Accordion.Item value="2">
-            <Accordion.Control><Text>STEP 2 Выберите даты для исключения (пример: ваши выходные или типо того)</Text></Accordion.Control>
+            <Accordion.Control><Text>{text.step[leng]} 2 {text.weekends[leng]}</Text></Accordion.Control>
             <Accordion.Panel>
             {handlers.editOneMultiEventDis()}
           </Accordion.Panel>
@@ -416,7 +454,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
     if(dateStartPeriod[0] && dateStartPeriod[1]){
       return (
           <Accordion.Item value="3">
-            <Accordion.Control><Text>STEP 3 Детальный редактор</Text></Accordion.Control>
+            <Accordion.Control><Text>{text.step[leng]} 3 {text.daysEdit[leng]}</Text></Accordion.Control>
             <Accordion.Panel>
               {handlers.editOneMultiEvent()}
               {handlers.daySlotsEdition()}

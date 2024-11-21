@@ -94,6 +94,11 @@ export const textArray: LengData[] = [
     {rutext: 'Пятница', index: 'day5', info_data: 'пятница'},
     {rutext: 'Суббота', index: 'day6', info_data: 'суббота'},
     {rutext: 'Воскресенье', index: 'day0', info_data: 'воскресенье'},
+    {rutext: 'Детальный редактор', index: 'daysEdit', info_data: 'детальный редактор'},
+    {rutext: 'Выбор дат когда вы не работаете, выходные, праздники и тому подобное', index: 'weekends', info_data: 'выбор дат'},
+    {rutext: 'Выбор даты мероприятия или периуда ваших постоянных мероприятий', index: 'daysOrPeriod', info_data: 'выбор дат или даты'},
+    {rutext: 'Шаг', index: 'step', info_data: 'шаг'},
+    {rutext: 'Для мероприятия в один день, данный шаг не требуется', index: 'oneDayEvent', info_data: 'мероприятие в один день'},
     
     
 ]
