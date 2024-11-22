@@ -1,13 +1,11 @@
 
 import '@mantine/core/styles.css'
-import { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import '../styles/App.css'
 import { useConnectSocket } from '../socket/hooks/useConnectSocket.ts'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Center, Grid, Switch } from '@mantine/core'
 import { EventItem } from '../components/events/EventItem.tsx'
-// import { ModalCreateEventOneTime } from '../components/events/ModalCreateEventOneTime.tsx'
-// import { ModalCreateEventPermament } from '../components/events/ModalCreateEventPermament.tsx'
 import { ButtonApp } from '../components/comps/ButtonApp.tsx'
 import { TextApp } from '../components/comps/TextApp.tsx'
 import { TextInputApp } from '../components/comps/TextInputApp.tsx'
@@ -96,16 +94,15 @@ export function EventPage() {
     idEvent: Date.now() + 'Event',
     name: eventName,
     status: 'open',
-    days: [],
-    // slots:[{
-    //   idSlot: Date.now() + 'Slot', 
-    //   startTime: '09:00', 
-    //   duration: 45, 
-    //   break: 15, 
-    //   clients: [], 
-    //   maxClients: 1,
-    //   openForRegistration: true
-    // }]
+    dateStartPeriod: [null, null],
+    daysForDelete: [],
+    checked: [0 ,1, 2, 3, 4, 5, 6],
+    referensDay: false,
+    currentEditDays: [],
+    daysArrow: [],
+    checkedEdit: [9 ,9, 9, 9, 9, 9, 9],
+    checkedAll: false,
+    days: []
   }
   
   const func = {
