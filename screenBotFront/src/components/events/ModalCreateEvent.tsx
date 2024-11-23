@@ -1,87 +1,100 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Grid, Paper, TextInput, Slider, Text, Checkbox, Accordion } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 import { TimeInput } from '@mantine/dates'
 import { DatePicker } from '@mantine/dates'
 
-export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
-  console.log(new Date(oneEvent.referensDay).getTime())
+interface EditedEvent {
+  idEvent: string,
+  name: string,
+  status: string,
+  dateStartPeriod: [Date | null, Date | null],
+  daysForDelete: Date[],
+  checked: number[],
+  referensDay: Date | false,
+  currentEditDays: Date[],
+  daysArrow: Date[],
+  checkedEdit: number[],
+  checkedAll: boolean,
+  days: Day[] 
+}
+interface Slots { 
+  startTime: string, 
+  duration: number, 
+  break: number, 
+  clients: [], 
+  maxClients: number,
+  openForRegistration: boolean
+}
+interface Day {
+  day: Date,
+  slots: Slots[]
+}
 
-  const [opened, { open, close }] = useDisclosure(false)
-  const [editedEvent, setEditedEvent] = useState(structuredClone(oneEvent))
+const getEditedEvent = (oneEvent) => {
+  const res = structuredClone(oneEvent)
+  res.days = res.days.map(item => ({...item, day: new Date(item.day)}))
+  res.dateStartPeriod = res.dateStartPeriod.map(item => item ? new Date(item) : null)
+  res.daysForDelete = res.daysForDelete.map(item => new Date(item))
+  res.daysArrow =  res.daysArrow.map(item => new Date(item))
+  res.currentEditDays = res.currentEditDays.map(item => new Date(item))
+  res.referensDay = res.referensDay ? new Date(res.referensDay) : false
+  return res
+}
+
+export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
+
   const [stat, setStat] = useState(0)
-  const [dateStartPeriod, setDateStartPeriod] = useState<[Date | null, Date | null]>(editedEvent.dateStartPeriod.forEach(item => item ? new Date(item): null))
-  const [daysForDelete, setDaysForDelete] = useState<Date[]>(editedEvent.daysForDelete.map(item => new Date(item)))
-  const [daysArrow, setDaysArrow] = useState<Date[]>(editedEvent.daysArrow.map(item => new Date(item)))
-  const [currentEditDays, setCurrentEditDays] = useState<Date[]>(editedEvent.currentEditDays.map(item => new Date(item)))
+  const [opened, { open, close }] = useDisclosure(false)
+
+  const [editedEvent, setEditedEvent] = useState<EditedEvent>(getEditedEvent(oneEvent))
+
+  const [dateStartPeriod, setDateStartPeriod] = useState(editedEvent.dateStartPeriod)
+  const [daysForDelete, setDaysForDelete] = useState<Date[]>(editedEvent.daysForDelete)
+  const [daysArrow, setDaysArrow] = useState<Date[]>(editedEvent.daysArrow)
+  const [currentEditDays, setCurrentEditDays] = useState<Date[]>(editedEvent.currentEditDays)
   const [checked, setChecked] = useState(editedEvent.checked)
   const [checkedEdit, setCheckedEdit] = useState(editedEvent.checkedEdit)
   const [checkedAll, setCheckedAll] = useState(editedEvent.checkedAll)
-  const [referensDay, setReferensDay] = useState<Date | false>(new Date(editedEvent.referensDay))
+  const [referensDay, setReferensDay] = useState<Date | false>(editedEvent.referensDay)
 
-  interface Slots {
-    // idSlot: string, 
-    startTime: string, 
-    duration: number, 
-    break: number, 
-    clients: [], 
-    maxClients: number,
-    openForRegistration: boolean
-  }
-
-  function dateSet (oneEvent){
-    return oneEvent.days.forEach(item => new Date(item.day))
-  }
-
-  
-  // console.log(editedEvent)
+  console.log(editedEvent)
   useMemo(() => {
-    setEditedEvent(structuredClone(oneEvent))
-  }, [oneEvent])
-  useMemo(() => {
+    
 
-    setCheckedEdit([9 ,9, 9, 9, 9, 9, 9])
-    setReferensDay(false)
-    setCheckedAll(false)
-
-    if(dateStartPeriod[0] && dateStartPeriod[1]){
-      // editedEvent.dateStartPeriod = dateStartPeriod
-      // editedEvent.daysForDelete = daysForDelete
-      // editedEvent.checked = checked
-      const result: Date[] = []
-      const startTime = dateStartPeriod[0].getTime()
-      const endTime = dateStartPeriod[1].getTime()
-      const countDays = ((endTime - startTime) / 86400000) + 1
-      for(let i = 0; i < countDays; i++){
-        result.push(new Date(startTime + (86400000 * i)))
+      if(dateStartPeriod[0] && dateStartPeriod[1]){
+        const result: Date[] = []
+        const startTime = dateStartPeriod[0].getTime()
+        const endTime = dateStartPeriod[1].getTime()
+        const countDays = ((endTime - startTime) / 86400000) + 1
+        for(let i = 0; i < countDays; i++){
+          result.push(new Date(startTime + (86400000 * i)))
+        }
+        const res = result.filter(item => checked.includes(item.getDay())).filter(item => !daysForDelete.map(item => item.getTime()).includes(item.getTime()))
+        
+        setDaysArrow(res)
+        for(const i of res){
+          const day = editedEvent.days.find(item => item.day.getTime() === i.getTime())
+          if(!day){
+            editedEvent.days.push(
+              {day: i,
+              slots: [{
+                startTime: '09:00', 
+                duration: 45, 
+                break: 15, 
+                clients: [], 
+                maxClients: 1,
+                openForRegistration: true
+            }]})
+        }
+        }
+        if(res.length === 1){
+          setCurrentEditDays(res)
+          setReferensDay(res[0])
+        }
       }
-      const res = result.filter(item => checked.includes(item.getDay())).filter(item => !daysForDelete.map(item => item.getTime()).includes(item.getTime()))
-      
-      setDaysArrow(res)
-      for(const i of res){
-        const day = editedEvent.days.find(item => item.day.getTime() === i.getTime())
-        if(!day){
-          editedEvent.days.push(
-            {day: i,
-            slots: [{
-              startTime: '09:00', 
-              duration: 45, 
-              break: 15, 
-              clients: [], 
-              maxClients: 1,
-              openForRegistration: true
-          }]})
-      }
-      }
-      if(res.length === 1){
-        setCurrentEditDays(res)
-        setReferensDay(res[0])
-      }
-    }
-
-  }, [dateStartPeriod, checked, daysForDelete, editedEvent.days])
-
+  }, [dateStartPeriod, checked, daysForDelete, editedEvent])
 
   const handlers = {
     addSlot: (existDay) => {
@@ -104,29 +117,31 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
       }
     },
     getTimeNextEvent: (day) => {
-      const existDay = editedEvent.days.find(item => item.day.getTime() === day.getTime())
+      if(day){
+        const existDay = editedEvent.days.find(item => item.day.getTime() === day.getTime())
+        if(existDay){
+          const clock = existDay.slots[existDay.slots.length - 1].startTime.split(':')
+          let x = Number(clock[1]) + existDay.slots[existDay.slots.length - 1].duration + existDay.slots[existDay.slots.length - 1].break
+          const upH = Number(clock[0]) + Math.floor(x / 60)
+          const upM = x % 60
 
-      const clock = existDay.slots[existDay.slots.length - 1].startTime.split(':')
-      let x = Number(clock[1]) + existDay.slots[existDay.slots.length - 1].duration + existDay.slots[existDay.slots.length - 1].break
-      const upH = Number(clock[0]) + Math.floor(x / 60)
-      const upM = x % 60
-
-      const timeToTwoDigits = (digit: number) => {
-        if(digit.toString().length === 1){
-          return '0' + digit
+          const timeToTwoDigits = (digit: number) => {
+            if(digit.toString().length === 1){
+              return '0' + digit
+            }
+            return digit
+          }
+          if(Number(timeToTwoDigits(upH)) < 24){
+            return (
+              <ButtonApp title={`${text.addSlot[leng]} ${timeToTwoDigits(upH)}:${timeToTwoDigits(upM)}`} handler={() => handlers.addSlot(existDay)} />
+            )
+            // setStat(Date.now())
+          }
+          return (
+            <ButtonApp title={text.addSlot[leng]} disabled={true}/>
+          )
         }
-        return digit
       }
-      if(Number(timeToTwoDigits(upH)) < 24){
-        return (
-          <ButtonApp title={`${text.addSlot[leng]} ${timeToTwoDigits(upH)}:${timeToTwoDigits(upM)}`} handler={() => handlers.addSlot(existDay)} />
-        )
-        // setStat(Date.now())
-      }
-      return (
-        <ButtonApp title={text.addSlot[leng]} disabled={true}/>
-      )
-      
     },
     openForReg: (item) => {
       if(item.onepForResistration){
@@ -168,6 +183,11 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                   }
                   setChecked([...checked])
                   setCurrentEditDays([])
+
+                  setCheckedEdit([9 ,9, 9, 9, 9, 9, 9])
+                  setReferensDay(false)
+                  setCheckedAll(false)
+
                 }}
               />
             </Grid.Col>)}
@@ -175,13 +195,16 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
       )
     },
     daySlotsEdition: () => {
+      console.log(referensDay)
       let main = true
       const colorEdit = (time) => {
-        if(referensDay && time.getTime() === referensDay.getTime()){
-          return 'green'
-        }
-        else if(referensDay && JSON.stringify(editedEvent.days.find(item => item.day.getTime() === time.getTime()).slots) === JSON.stringify(editedEvent.days.find(item => item.day.getTime() === referensDay.getTime()).slots)){
-          return 'yellow'
+        if(editedEvent && time){
+          if(referensDay && time.getTime() === referensDay.getTime()){
+            return 'green'
+          }
+          else if(referensDay && JSON.stringify(editedEvent.days.find(item => item.day.getTime() === time.getTime()).slots) === JSON.stringify(editedEvent.days.find(item => item.day.getTime() === referensDay.getTime()).slots)){
+            return 'yellow'
+          }
         }
         main = false
       }
@@ -446,7 +469,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
           <ButtonApp 
               title={text.cancel[leng]} 
               handler={() => {
-                setEditedEvent(oneEvent)
+                setEditedEvent(getEditedEvent(oneEvent))
                 close()
               }}
               disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
@@ -465,7 +488,8 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                 daysArrow: daysArrow,
                 checkedEdit: checkedEdit,
                 checkedAll: checkedAll
-              })} 
+              })
+            }
               disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
             />
         </Grid.Col>
@@ -492,6 +516,11 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
               onChange={(value) => {
                 setDateStartPeriod(value)
                 setCurrentEditDays([])
+
+                setCheckedEdit([9 ,9, 9, 9, 9, 9, 9])
+                setReferensDay(false)
+                setCheckedAll(false)
+
               }}
             />
             <div style={{marginTop: '1vmax', marginBottom: '1vmax'}}>
@@ -548,5 +577,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   else{
     return <div>Loading</div>
   }
+
+  // return <div>yyyyy</div>
 
 }
