@@ -61,6 +61,7 @@ export function EventPage() {
 
 
   useEffect(() => {
+    console.log('test use')
     if(!sessionStorage.getItem('token')){
       window.location.assign(process.env.REACT_APP_BOTNAME)
     }
@@ -80,7 +81,7 @@ export function EventPage() {
       }
       setStatus(true)
     }
-  }, [])
+  }, [botId, leng, text])
 
   const eventFilter = useMemo(() => {
     if(!checked){

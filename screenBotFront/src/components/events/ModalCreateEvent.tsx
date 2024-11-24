@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Grid, Paper, TextInput, Slider, Text, Checkbox, Accordion } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
@@ -34,12 +34,16 @@ interface Day {
 
 const getEditedEvent = (oneEvent) => {
   const res = structuredClone(oneEvent)
+  console.log('Сравнение до:' , res === oneEvent)
+  console.log('Сравнение до строки:' ,JSON.stringify(res) === JSON.stringify(oneEvent))
   res.days = res.days.map(item => ({...item, day: new Date(item.day)}))
   res.dateStartPeriod = res.dateStartPeriod.map(item => item ? new Date(item) : null)
   res.daysForDelete = res.daysForDelete.map(item => new Date(item))
   res.daysArrow =  res.daysArrow.map(item => new Date(item))
   res.currentEditDays = res.currentEditDays.map(item => new Date(item))
   res.referensDay = res.referensDay ? new Date(res.referensDay) : false
+  console.log('Сравнение после:' , res === oneEvent)
+  console.log('Сравнение после строки:' ,JSON.stringify(res) === JSON.stringify(oneEvent))
   return res
 }
 
@@ -47,9 +51,8 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
 
   const [stat, setStat] = useState(0)
   const [opened, { open, close }] = useDisclosure(false)
-
+  const [natureEvent] = useState(oneEvent)
   const [editedEvent, setEditedEvent] = useState<EditedEvent>(getEditedEvent(oneEvent))
-
   const [dateStartPeriod, setDateStartPeriod] = useState(editedEvent.dateStartPeriod)
   const [daysForDelete, setDaysForDelete] = useState<Date[]>(editedEvent.daysForDelete)
   const [daysArrow, setDaysArrow] = useState<Date[]>(editedEvent.daysArrow)
@@ -59,11 +62,27 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   const [checkedAll, setCheckedAll] = useState(editedEvent.checkedAll)
   const [referensDay, setReferensDay] = useState<Date | false>(editedEvent.referensDay)
 
-  console.log(editedEvent)
+  useEffect(() => {
+    // setEditedEvent(editedEvent)
+    if(JSON.stringify(oneEvent) !== JSON.stringify(natureEvent)){
+      console.log('rerender')
+      const res = getEditedEvent(oneEvent)
+      setEditedEvent(res)
+      setDateStartPeriod(res.dateStartPeriod)
+      setDaysForDelete(res.daysForDelete)
+      setDaysArrow(res.daysArrow)
+      setCurrentEditDays(res.currentEditDays)
+      setChecked(res.checked)
+      setCheckedEdit(res.checkedEdit)
+      setCheckedAll(res.checkedAll)
+      setReferensDay(res.referensDay)
+    }
+  }, [])
+
   useMemo(() => {
-    
 
       if(dateStartPeriod[0] && dateStartPeriod[1]){
+        console.log('MEMO')
         const result: Date[] = []
         const startTime = dateStartPeriod[0].getTime()
         const endTime = dateStartPeriod[1].getTime()
@@ -73,7 +92,11 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         }
         const res = result.filter(item => checked.includes(item.getDay())).filter(item => !daysForDelete.map(item => item.getTime()).includes(item.getTime()))
         
+        // updateEditedEvent.updateDaysArrow(res)
         setDaysArrow(res)
+        editedEvent.daysArrow = res
+        
+        editedEvent.days = []
         for(const i of res){
           const day = editedEvent.days.find(item => item.day.getTime() === i.getTime())
           if(!day){
@@ -87,16 +110,66 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                 maxClients: 1,
                 openForRegistration: true
             }]})
-        }
+          }
         }
         if(res.length === 1){
           setCurrentEditDays(res)
+          editedEvent.currentEditDays = res
+          // updateEditedEvent.updateCurrentEditDays(res)
+          // updateEditedEvent.updateReferensDay(res[0])
           setReferensDay(res[0])
+          editedEvent.referensDay = res[0]
         }
       }
+
   }, [dateStartPeriod, checked, daysForDelete, editedEvent])
 
+  const updateEditedEvent = {
+
+    updateDateStartPeriod: (data) => {
+      console.log('dateStartPeriod')
+      setDateStartPeriod(data)
+      editedEvent.dateStartPeriod = data
+    },
+    updateDaysForDelete: (data) => {
+      console.log('daysForDelete')
+      setDaysForDelete(data)
+      editedEvent.daysForDelete = data
+    },
+    updateDaysArrow: (data) => {
+      console.log('daysArrow')
+      setDaysArrow(data)
+      editedEvent.daysArrow = data
+    },
+    updateCurrentEditDays: (data) => {
+      console.log('currentEditDays')
+      setCurrentEditDays(data)
+      editedEvent.currentEditDays = data
+    },
+    updateChecked: (data) => {
+      console.log('checked')
+      setChecked(data)
+      editedEvent.checked = data
+    },
+    updateCheckedEdit: (data) => {
+      console.log('checkedEdit')
+      setCheckedEdit(data)
+      editedEvent.checkedEdit = data
+    },
+    updateCheckedAll: (data) => {
+      console.log('checkedAll')
+      setCheckedAll(data)
+      editedEvent.checkedAll = data
+    },
+    updateReferensDay: (data) => {
+      console.log('referensDay')
+      setReferensDay(data)
+      editedEvent.referensDay = data
+    }
+  }
+
   const handlers = {
+    
     addSlot: (existDay) => {
       console.log(stat)
       const clock = existDay.slots[existDay.slots.length - 1].startTime.split(':')
@@ -135,7 +208,6 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
             return (
               <ButtonApp title={`${text.addSlot[leng]} ${timeToTwoDigits(upH)}:${timeToTwoDigits(upM)}`} handler={() => handlers.addSlot(existDay)} />
             )
-            // setStat(Date.now())
           }
           return (
             <ButtonApp title={text.addSlot[leng]} disabled={true}/>
@@ -143,70 +215,82 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         }
       }
     },
-    openForReg: (item) => {
-      if(item.onepForResistration){
+    // openForReg: (item) => {
+    //   if(item.onepForResistration){
+    //     return (
+    //       <ButtonApp
+    //         title={'Close for registration'}
+    //         handler={() => {
+    //           item.onepForResistration = false
+    //           setStat(Date.now())
+    //         }}
+    //     />
+    //     )
+    //   }
+    //   return (
+    //     <ButtonApp
+    //       title={'Open for registration'}
+    //       handler={() => {
+    //         item.onepForResistration = true
+    //         setStat(Date.now())
+    //       }}
+    //   />
+    //   )
+
+    // },
+    filterDays: () => {
+      if(dateStartPeriod[0] && dateStartPeriod[1]){
         return (
-          <ButtonApp
-            title={'Close for registration'}
-            handler={() => {
-              item.onepForResistration = false
-              setStat(Date.now())
-            }}
-        />
+          <Grid>
+            {checked.map((item, index) => 
+              <Grid.Col span={1.5} key={index}>
+                  <Checkbox
+                  label={text[`day${index}`][leng].substring(0, 3)}
+                  checked={checked.includes(index)}
+                  onChange={(event) => {
+                    if(event.currentTarget.checked){
+                      checked[index] = index
+                    }
+                    else{
+                      checked[index] = 9
+                    }
+                    updateEditedEvent.updateDaysForDelete([])
+                    updateEditedEvent.updateCurrentEditDays([])
+                    updateEditedEvent.updateReferensDay(false)
+                    updateEditedEvent.updateCheckedAll(false)
+                    updateEditedEvent.updateCheckedEdit([9 ,9, 9, 9, 9, 9, 9])
+                    updateEditedEvent.updateChecked([...checked])
+                    // editedEvent.checked = [...checked]
+                  }}
+                />
+              </Grid.Col>)}
+          </Grid>
         )
       }
-      return (
-        <ButtonApp
-          title={'Open for registration'}
-          handler={() => {
-            item.onepForResistration = true
-            setStat(Date.now())
-          }}
-      />
-      )
-
-    },
-    filterDays: () => {
-      return (
-        <Grid>
-          {checked.map((item, index) => 
-            <Grid.Col span={1.5} key={index}>
-                <Checkbox
-                label={text[`day${index}`][leng].substring(0, 3)}
-                checked={checked.includes(index)}
-                onChange={(event) => {
-                  if(event.currentTarget.checked){
-                    checked[index] = index
-                  }
-                  else{
-                    checked[index] = 9
-                  }
-                  setChecked([...checked])
-                  setCurrentEditDays([])
-
-                  setCheckedEdit([9 ,9, 9, 9, 9, 9, 9])
-                  setReferensDay(false)
-                  setCheckedAll(false)
-
-                }}
-              />
-            </Grid.Col>)}
-        </Grid>
-      )
     },
     daySlotsEdition: () => {
-      console.log(referensDay)
-      let main = true
+      // let main = true
       const colorEdit = (time) => {
         if(editedEvent && time){
           if(referensDay && time.getTime() === referensDay.getTime()){
             return 'green'
           }
-          else if(referensDay && JSON.stringify(editedEvent.days.find(item => item.day.getTime() === time.getTime()).slots) === JSON.stringify(editedEvent.days.find(item => item.day.getTime() === referensDay.getTime()).slots)){
+          else if(referensDay && JSON.stringify(editedEvent.days.find(item => item.day.getTime() === time.getTime())?.slots) === JSON.stringify(editedEvent.days.find(item => item.day.getTime() === referensDay.getTime())?.slots)){
             return 'yellow'
           }
+          // main = false
         }
-        main = false
+      }
+      const saveButton = () => {
+        if(referensDay){
+          return (
+                  <ButtonApp 
+                    title={text.save[leng]} 
+                    handler={() => handlers.copySlots(referensDay)} 
+                    // disabled={main}
+                  />
+          )
+        }
       }
       if(currentEditDays.length){
         return (
@@ -218,7 +302,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                       <Grid.Col span={1.7} key={index}>
                         <ButtonApp 
                           title={item.getDate() + '.' + (item.getMonth() + 1) + '.' + item.getFullYear()}
-                          handler={() => setReferensDay(item)} 
+                          handler={() => updateEditedEvent.updateReferensDay(item)} 
                           color={colorEdit(item)}
                         />
                       </Grid.Col>
@@ -234,20 +318,20 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                 <Grid.Col span={7} style={{marginTop: '1vmax'}}>
                 </Grid.Col>
                 <Grid.Col span={2} style={{marginTop: '1vmax'}}>
-                  <ButtonApp 
-                    title={text.save[leng]} 
-                    handler={() => handlers.copySlots()} 
-                    disabled={main}
-                  />
+                  {saveButton()}
                 </Grid.Col>
               </Grid>
             </Paper>
         )
       }
     },
-    copySlots: () => {
+    copySlots: (referensDay) => {
       for(const i of currentEditDays){
-        if(referensDay) editedEvent.days.find(item => item.day.getTime() === i.getTime()).slots = [...editedEvent.days.find(item => item.day.getTime() === referensDay.getTime()).slots]
+        const newSlots = editedEvent.days.find(item => item.day.getTime() === i.getTime())
+        const copiedSlots = editedEvent.days.find(item => item.day.getTime() === referensDay.getTime())
+        if(referensDay && newSlots && copiedSlots){
+          newSlots.slots = [...copiedSlots.slots]
+        }
       }
       setStat(Date.now())
     },
@@ -341,14 +425,14 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                   else{
                     checkedEdit[index] = 9
                     if(referensDay && referensDay.getDay() === index){
-                      setReferensDay(false)
+                      updateEditedEvent.updateReferensDay(false)
                     }
                   }
-                  setCheckedEdit([...checkedEdit])
-                  setCheckedAll(false)
+                  updateEditedEvent.updateCheckedEdit([...checkedEdit])
+                  updateEditedEvent.updateCheckedAll(false)
                   const res = daysArrow.filter(item => checkedEdit.includes(item.getDay()))
-                  setCurrentEditDays(res)
-                  setReferensDay(res.length ? res[0] : false)
+                  updateEditedEvent.updateCurrentEditDays(res)
+                  updateEditedEvent.updateReferensDay(res.length ? res[0] : false)
                   
                 }}
               />
@@ -372,15 +456,15 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                 value={currentEditDays} 
                 onChange={(value) => {
                   if((referensDay && !value.map(item => item.getTime()).includes(referensDay.getTime())) || !referensDay){
-                    setReferensDay(value ? value[0] : false)
+                    updateEditedEvent.updateReferensDay(value ? value[0] : false)
                   }
                   if(value.length !== currentEditDays.length){
-                    setCheckedAll(false)
+                    updateEditedEvent.updateCheckedAll(false)
                   }
                   if(value.length === daysArrow.length){
-                    setCheckedAll(true)
+                    updateEditedEvent.updateCheckedAll(true)
                   }
-                  setCurrentEditDays(value)
+                  updateEditedEvent.updateCurrentEditDays(value)
                 }}
                 minDate={dateStartPeriod[0]}
                 maxDate={dateStartPeriod[1]}
@@ -393,16 +477,16 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                   label={text.selectAll[leng]}
                   checked={checkedAll}
                   onChange={(event) => {
-                    setCheckedAll(event.currentTarget.checked)
+                    updateEditedEvent.updateCheckedAll(event.currentTarget.checked)
                     if(event.currentTarget.checked){
-                      setCurrentEditDays(daysArrow)
-                      setReferensDay(daysArrow[0])
-                      setCheckedEdit([0 ,1, 2, 3, 4, 5, 6])
+                      updateEditedEvent.updateCurrentEditDays(daysArrow)
+                      updateEditedEvent.updateReferensDay(daysArrow[0])
+                      updateEditedEvent.updateCheckedEdit([0 ,1, 2, 3, 4, 5, 6])
                     }
                     else{
-                      setReferensDay(false)
-                      setCurrentEditDays([])
-                      setCheckedEdit([9 ,9, 9, 9, 9, 9, 9])
+                      updateEditedEvent.updateReferensDay(false)
+                      updateEditedEvent.updateCurrentEditDays([])
+                      updateEditedEvent.updateCheckedEdit([9 ,9, 9, 9, 9, 9, 9])
                     }
                   }}
                 />
@@ -426,8 +510,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                 numberOfColumns={3} 
                 value={daysForDelete}
                 onChange={(value) => {
-                  setDaysForDelete(value)
-                  setCurrentEditDays([])
+                  updateEditedEvent.updateDaysForDelete(value)
                 }}
                 minDate={dateStartPeriod[0]}
                 maxDate={dateStartPeriod[1]}
@@ -435,15 +518,11 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
           </>
         )
       }
-      // else{
-      //   return (
-      //     <>{text.oneDayEvent[leng]}</>
-      //   )
-      // }
     }
   }
 
   const titleData = () => {
+    console.log('titleData', JSON.stringify(oneEvent) === JSON.stringify(editedEvent))
     return (
       <Grid>
         <Grid.Col span={4}>
@@ -478,17 +557,18 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         <Grid.Col span={2}>
           <ButtonApp 
               title={text.save[leng]} 
-              handler={() => updateEvent(oneEvent, 
-                {...editedEvent, 
-                dateStartPeriod: dateStartPeriod, 
-                daysForDelete: daysForDelete,
-                checked: checked,
-                referensDay: referensDay,
-                currentEditDays: currentEditDays,
-                daysArrow: daysArrow,
-                checkedEdit: checkedEdit,
-                checkedAll: checkedAll
-              })
+              handler={() => updateEvent(oneEvent, editedEvent
+                // {...editedEvent, 
+                // dateStartPeriod: dateStartPeriod, 
+                // daysForDelete: daysForDelete,
+                // checked: checked,
+                // referensDay: referensDay,
+                // currentEditDays: currentEditDays,
+                // daysArrow: daysArrow,
+                // checkedEdit: checkedEdit,
+                // checkedAll: checkedAll
+              // }
+              )
             }
               disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
             />
@@ -514,13 +594,15 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
               numberOfColumns={3} 
               value={dateStartPeriod} 
               onChange={(value) => {
-                setDateStartPeriod(value)
-                setCurrentEditDays([])
-
-                setCheckedEdit([9 ,9, 9, 9, 9, 9, 9])
-                setReferensDay(false)
-                setCheckedAll(false)
-
+                updateEditedEvent.updateChecked([0 ,1, 2, 3, 4, 5, 6])
+                updateEditedEvent.updateDateStartPeriod(value)
+                if(value[0] && value[1]){
+                  updateEditedEvent.updateDaysForDelete([])
+                  updateEditedEvent.updateCurrentEditDays([])
+                  updateEditedEvent.updateReferensDay(false)
+                  updateEditedEvent.updateCheckedAll(false)
+                  updateEditedEvent.updateCheckedEdit([9 ,9, 9, 9, 9, 9, 9])
+                }
               }}
             />
             <div style={{marginTop: '1vmax', marginBottom: '1vmax'}}>
@@ -533,7 +615,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   const dataDeSelect = () => {
     return (
         <Accordion.Item value="2">
-          <Accordion.Control disabled={(!dateStartPeriod[0] || !dateStartPeriod[1]) || daysArrow.length === 1}><Text>{text.step[leng]} 2 {text.weekends[leng]}</Text></Accordion.Control>
+          <Accordion.Control disabled={(!dateStartPeriod[0] || !dateStartPeriod[1]) || daysArrow.length < 2}><Text>{text.step[leng]} 2 {text.weekends[leng]}</Text></Accordion.Control>
           <Accordion.Panel>
           {handlers.editOneMultiEventDis()}
         </Accordion.Panel>
@@ -543,7 +625,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   const readySelect = () => {
     return (
         <Accordion.Item value="3">
-          <Accordion.Control disabled={!dateStartPeriod[0] || !dateStartPeriod[1]}><Text>{text.step[leng]} 3 {text.daysEdit[leng]}</Text></Accordion.Control>
+          <Accordion.Control disabled={!dateStartPeriod[0] || !dateStartPeriod[1] || daysArrow.length === 0}><Text>{text.step[leng]} 3 {text.daysEdit[leng]}</Text></Accordion.Control>
           <Accordion.Panel>
             {handlers.editOneMultiEvent()}
             {handlers.daySlotsEdition()}
@@ -552,32 +634,25 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
     )
   }
 
-  if(editedEvent){
-    return (
+  return (
+    <>
+      <Modal size={'65vmax'} opened={opened} 
+        onClose={close}
+        title={editedEvent.name}
+      >
       <>
-        <Modal size={'65vmax'} opened={opened} 
-          onClose={close}
-          title={editedEvent.name}
-        >
-        <>
 
-          {titleData()}
-          <Accordion variant="separated">
-          {readySelect()}
-          {dataDeSelect()}
-          {dataSelect()}
-          </Accordion>
+        {titleData()}
+        <Accordion variant="separated">
+        {readySelect()}
+        {dataDeSelect()}
+        {dataSelect()}
+        </Accordion>
 
-        </>
-        </Modal>
-        <ButtonApp title={text.edit[leng]} handler={open} />
       </>
-    )
-  }
-  else{
-    return <div>Loading</div>
-  }
-
-  // return <div>yyyyy</div>
+      </Modal>
+      <ButtonApp title={text.edit[leng]} handler={open} />
+    </>
+  )
 
 }
