@@ -34,20 +34,20 @@ interface Day {
 
 const getEditedEvent = (oneEvent) => {
   const res = structuredClone(oneEvent)
-  console.log('Сравнение до:' , res === oneEvent)
-  console.log('Сравнение до строки:' ,JSON.stringify(res) === JSON.stringify(oneEvent))
+  // console.log('Сравнение до:' , res === oneEvent)
+  // console.log('Сравнение до строки:' ,JSON.stringify(res) === JSON.stringify(oneEvent))
   res.days = res.days.map(item => ({...item, day: new Date(item.day)}))
   res.dateStartPeriod = res.dateStartPeriod.map(item => item ? new Date(item) : null)
   res.daysForDelete = res.daysForDelete.map(item => new Date(item))
   res.daysArrow =  res.daysArrow.map(item => new Date(item))
   res.currentEditDays = res.currentEditDays.map(item => new Date(item))
   res.referensDay = res.referensDay ? new Date(res.referensDay) : false
-  console.log('Сравнение после:' , res === oneEvent)
-  console.log('Сравнение после строки:' ,JSON.stringify(res) === JSON.stringify(oneEvent))
+  // console.log('Сравнение после:' , res === oneEvent)
+  // console.log('Сравнение после строки:' ,JSON.stringify(res) === JSON.stringify(oneEvent))
   return res
 }
 
-export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
+export function ModalCreateEvent({text, leng, oneEvent, updateEvent, setEvents}) {
 
   const [stat, setStat] = useState(0)
   const [opened, { open, close }] = useDisclosure(false)
@@ -63,7 +63,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   const [referensDay, setReferensDay] = useState<Date | false>(editedEvent.referensDay)
 
   useEffect(() => {
-    // setEditedEvent(editedEvent)
+    console.log('fvfv')
     if(JSON.stringify(oneEvent) !== JSON.stringify(natureEvent)){
       console.log('rerender')
       const res = getEditedEvent(oneEvent)
@@ -82,7 +82,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   useMemo(() => {
 
       if(dateStartPeriod[0] && dateStartPeriod[1]){
-        console.log('MEMO')
+        // console.log('MEMO')
         const result: Date[] = []
         const startTime = dateStartPeriod[0].getTime()
         const endTime = dateStartPeriod[1].getTime()
@@ -92,11 +92,10 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         }
         const res = result.filter(item => checked.includes(item.getDay())).filter(item => !daysForDelete.map(item => item.getTime()).includes(item.getTime()))
         
-        // updateEditedEvent.updateDaysArrow(res)
         setDaysArrow(res)
         editedEvent.daysArrow = res
         
-        editedEvent.days = []
+        editedEvent.days = editedEvent.days.filter(item => res.map(item => item.getTime()).includes(item.day.getTime()))
         for(const i of res){
           const day = editedEvent.days.find(item => item.day.getTime() === i.getTime())
           if(!day){
@@ -115,8 +114,6 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         if(res.length === 1){
           setCurrentEditDays(res)
           editedEvent.currentEditDays = res
-          // updateEditedEvent.updateCurrentEditDays(res)
-          // updateEditedEvent.updateReferensDay(res[0])
           setReferensDay(res[0])
           editedEvent.referensDay = res[0]
         }
@@ -167,11 +164,9 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
       editedEvent.referensDay = data
     }
   }
-
   const handlers = {
     
     addSlot: (existDay) => {
-      console.log(stat)
       const clock = existDay.slots[existDay.slots.length - 1].startTime.split(':')
       let x = Number(clock[1]) + existDay.slots[existDay.slots.length - 1].duration + existDay.slots[existDay.slots.length - 1].break
       const upH = Number(clock[0]) + Math.floor(x / 60)
@@ -189,9 +184,9 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         setStat(Date.now())
       }
     },
-    getTimeNextEvent: (day) => {
-      if(day){
-        const existDay = editedEvent.days.find(item => item.day.getTime() === day.getTime())
+    getTimeNextEvent: () => {
+      if(referensDay){
+        const existDay = editedEvent.days.find(item => item.day.getTime() === referensDay.getTime())
         if(existDay){
           const clock = existDay.slots[existDay.slots.length - 1].startTime.split(':')
           let x = Number(clock[1]) + existDay.slots[existDay.slots.length - 1].duration + existDay.slots[existDay.slots.length - 1].break
@@ -206,7 +201,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
           }
           if(Number(timeToTwoDigits(upH)) < 24){
             return (
-              <ButtonApp title={`${text.addSlot[leng]} ${timeToTwoDigits(upH)}:${timeToTwoDigits(upM)}`} handler={() => handlers.addSlot(existDay)} />
+              <ButtonApp title={`${timeToTwoDigits(upH)}:${timeToTwoDigits(upM)} ${text.addSlot[leng]}`} handler={() => handlers.addSlot(existDay)} />
             )
           }
           return (
@@ -269,7 +264,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
       }
     },
     daySlotsEdition: () => {
-      // let main = true
+      let main = true
       const colorEdit = (time) => {
         if(editedEvent && time){
           if(referensDay && time.getTime() === referensDay.getTime()){
@@ -278,15 +273,16 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
           else if(referensDay && JSON.stringify(editedEvent.days.find(item => item.day.getTime() === time.getTime())?.slots) === JSON.stringify(editedEvent.days.find(item => item.day.getTime() === referensDay.getTime())?.slots)){
             return 'yellow'
           }
-          // main = false
+          main = false
+          // return 'red'
         }
       }
       const saveButton = () => {
-        if(referensDay){
+        if(referensDay && currentEditDays.length > 1 && !main){
           return (
                   <ButtonApp 
-                    title={text.save[leng]} 
-                    handler={() => handlers.copySlots(referensDay)} 
+                    title={text.updateAllDay[leng]} 
+                    handler={() => handlers.copySlots()} 
                     // disabled={main}
                   />
           )
@@ -310,14 +306,14 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                   </Grid>
                 </Grid.Col>
                 <Grid.Col span={12} style={{marginTop: '1vmax'}}>
-                  {handlers.dayEvents(referensDay)}
+                  {handlers.dayEvents()}
+                </Grid.Col>
+                <Grid.Col span={4} style={{marginTop: '1vmax'}}>
+                  {handlers.getTimeNextEvent()}
                 </Grid.Col>
                 <Grid.Col span={3} style={{marginTop: '1vmax'}}>
-                  {handlers.getTimeNextEvent(referensDay)}
                 </Grid.Col>
-                <Grid.Col span={7} style={{marginTop: '1vmax'}}>
-                </Grid.Col>
-                <Grid.Col span={2} style={{marginTop: '1vmax'}}>
+                <Grid.Col span={5} style={{marginTop: '1vmax'}}>
                   {saveButton()}
                 </Grid.Col>
               </Grid>
@@ -325,89 +321,94 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         )
       }
     },
-    copySlots: (referensDay) => {
-      for(const i of currentEditDays){
-        const newSlots = editedEvent.days.find(item => item.day.getTime() === i.getTime())
+    copySlots: () => {
+      if(referensDay){
         const copiedSlots = editedEvent.days.find(item => item.day.getTime() === referensDay.getTime())
-        if(referensDay && newSlots && copiedSlots){
-          newSlots.slots = [...copiedSlots.slots]
+        console.log(copiedSlots)
+        for(const i of currentEditDays){
+          const newSlots = editedEvent.days.find(item => item.day.getTime() === i.getTime())
+          console.log(newSlots)
+          if(referensDay && newSlots && copiedSlots){
+            newSlots.slots = [...copiedSlots.slots]
+          }
         }
+        setStat(Date.now())
       }
-      setStat(Date.now())
     },
-    dayEvents: (day) => {
+    dayEvents: () => {
+      if(referensDay){
+        const editedSlots: Slots[] = (editedEvent.days[editedEvent.days.findIndex(item => item.day.getTime() === referensDay.getTime())]).slots
 
-      const editedSlots: Slots[] = (editedEvent.days[editedEvent.days.findIndex(item => item.day.getTime() === day.getTime())]).slots
-
-      return editedSlots.map((item, index) => 
-      <Grid.Col key={index} span={12}>
-        <Paper withBorder p="lg" radius="md" shadow="md">
-          <Grid align="flex-end">
-            <Grid.Col span={3}>
-            <TimeInput
-              disabled={index !== editedSlots.length - 1 || editedSlots.length !== 1}
-              value={item.startTime}
-              onChange={(event) => {
-                item.startTime = event.currentTarget.value
-                setStat(Date.now())
-              }}
-              size="xs"
-              radius="sm"
-              label={text.startSlot[leng]}
-            />
-            </Grid.Col>
-            <Grid.Col span={3}>
-              <TextInput
-                disabled={index !== editedSlots.length - 1}
+        return editedSlots.map((item, index) => 
+        <Grid.Col key={index} span={12}>
+          <Paper withBorder p="lg" radius="md" shadow="md">
+            <Grid align="flex-end">
+              <Grid.Col span={3}>
+              <TimeInput
+                disabled={index !== editedSlots.length - 1 || editedSlots.length !== 1}
+                value={item.startTime}
                 onChange={(event) => {
-                  item.duration = Number(event.currentTarget.value)
+                  item.startTime = event.currentTarget.value
                   setStat(Date.now())
                 }}
-                value={item.duration}
                 size="xs"
                 radius="sm"
-                label={text.durmin[leng]}
+                label={text.startSlot[leng]}
               />
-            </Grid.Col>
-            <Grid.Col span={3}>
-              <TextInput
-                disabled={index !== editedSlots.length - 1}
-                onChange={(event) => {
-                  item.break = Number(event.currentTarget.value)
-                  setStat(Date.now())
-                }}
-                value={item.break}
-                size="xs"
-                radius="sm"
-                label={text.pausmin[leng]}
-              />
-              <Slider
-                disabled={index !== editedSlots.length - 1}
-                max={180}
-                step={5}
-                min={0}
-                label={null}
-                value={item.break}
-                onChange={(event) => {
-                  item.break = event
-                  setStat(Date.now())
-                }}
-                size={2}
-              />
-            </Grid.Col>
-            <Grid.Col span={3}>
-              <ButtonApp
-                title={text.delete[leng]}
-                disabled={index !== editedSlots.length - 1 || editedSlots.length === 1}
-                handler={() => {
-                  editedSlots.splice(-1)
-                  setStat(Date.now())
-                }}
-              />
-            </Grid.Col>
-          </Grid>
-        </Paper>
-      </Grid.Col>)
+              </Grid.Col>
+              <Grid.Col span={3}>
+                <TextInput
+                  disabled={index !== editedSlots.length - 1}
+                  onChange={(event) => {
+                    item.duration = Number(event.currentTarget.value)
+                    setStat(Date.now())
+                  }}
+                  value={item.duration}
+                  size="xs"
+                  radius="sm"
+                  label={text.durmin[leng]}
+                />
+              </Grid.Col>
+              <Grid.Col span={3}>
+                <TextInput
+                  disabled={index !== editedSlots.length - 1}
+                  onChange={(event) => {
+                    item.break = Number(event.currentTarget.value)
+                    setStat(Date.now())
+                  }}
+                  value={item.break}
+                  size="xs"
+                  radius="sm"
+                  label={text.pausmin[leng]}
+                />
+                <Slider
+                  disabled={index !== editedSlots.length - 1}
+                  max={180}
+                  step={5}
+                  min={0}
+                  label={null}
+                  value={item.break}
+                  onChange={(event) => {
+                    item.break = event
+                    setStat(Date.now())
+                  }}
+                  size={2}
+                />
+              </Grid.Col>
+              <Grid.Col span={3}>
+                <ButtonApp
+                  title={text.delete[leng]}
+                  disabled={index !== editedSlots.length - 1 || editedSlots.length === 1}
+                  handler={() => {
+                    editedSlots.splice(-1)
+                    setStat(Date.now())
+                  }}
+                />
+              </Grid.Col>
+            </Grid>
+          </Paper>
+        </Grid.Col>)
+      }
     },
     filterDaysEditDays: () => {
       return (
@@ -522,7 +523,9 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
   }
 
   const titleData = () => {
-    console.log('titleData', JSON.stringify(oneEvent) === JSON.stringify(editedEvent))
+    // console.log('titleData', JSON.stringify(oneEvent) === JSON.stringify(editedEvent))
+    // console.log(oneEvent)
+    // console.log(editedEvent)
     return (
       <Grid>
         <Grid.Col span={4}>
@@ -557,7 +560,10 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
         <Grid.Col span={2}>
           <ButtonApp 
               title={text.save[leng]} 
-              handler={() => updateEvent(oneEvent, editedEvent
+              handler={() => {
+                updateEvent(oneEvent, editedEvent)
+                // setEvents([])
+                }
                 // {...editedEvent, 
                 // dateStartPeriod: dateStartPeriod, 
                 // daysForDelete: daysForDelete,
@@ -568,7 +574,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent}) {
                 // checkedEdit: checkedEdit,
                 // checkedAll: checkedAll
               // }
-              )
+              // )
             }
               disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
             />

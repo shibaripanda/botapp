@@ -3,10 +3,10 @@ import React from 'react'
 import { ButtonApp } from '../comps/ButtonApp.tsx';
 import { ModalCreateEvent } from './ModalCreateEvent.tsx';
 
-export function EventItem({text, leng, oneEvent, deleteEvent, updateEvent}){
+export function EventItem({text, leng, oneEvent, deleteEvent, updateEvent, setEvents}){
 
   const buttonsSection = [
-    <ModalCreateEvent text={text} leng={leng} oneEvent={oneEvent} updateEvent={updateEvent} />,
+    <ModalCreateEvent text={text} leng={leng} oneEvent={oneEvent} updateEvent={updateEvent} setEvents={setEvents}/>,
     <ButtonApp title={text.delete[leng]} handler={() => deleteEvent(oneEvent)} disabled={false} color={'red'}/>
   ]
 

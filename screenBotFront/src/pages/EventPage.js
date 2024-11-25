@@ -159,6 +159,7 @@ export function EventPage() {
             handler={() => {
               func.createEvent()
               setEventName('')
+              setEvents([])
             }} 
             disabled={!eventName}/>
           </Grid.Col>
@@ -170,6 +171,7 @@ export function EventPage() {
         <Grid>
           {eventFilter.map((item, index) => <Grid.Col key={index} span={4}>
             <EventItem
+              setEvents={setEvents}
               text={text}
               leng={leng}
               updateEvent={func.updateEvent}

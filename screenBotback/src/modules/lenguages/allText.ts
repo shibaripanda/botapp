@@ -99,6 +99,7 @@ export const textArray: LengData[] = [
     {rutext: 'Выбор даты мероприятия или периуда ваших постоянных мероприятий', index: 'daysOrPeriod', info_data: 'выбор дат или даты'},
     {rutext: 'Шаг', index: 'step', info_data: 'шаг'},
     {rutext: 'Для мероприятия в один день, данный шаг не требуется', index: 'oneDayEvent', info_data: 'мероприятие в один день'},
+    {rutext: 'Обновить все выбранные дни', index: 'updateAllDay', info_data: 'обновить все дни'},
     
     
 ]
