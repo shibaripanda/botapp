@@ -100,6 +100,11 @@ export const textArray: LengData[] = [
     {rutext: 'Шаг', index: 'step', info_data: 'шаг'},
     {rutext: 'Для мероприятия в один день, данный шаг не требуется', index: 'oneDayEvent', info_data: 'мероприятие в один день'},
     {rutext: 'Обновить все выбранные дни', index: 'updateAllDay', info_data: 'обновить все дни'},
+    {rutext: 'Опубликовать', index: 'public', info_data: 'опубликовать'},
+    {rutext: 'Новое', index: 'new', info_data: 'новое'},
+    {rutext: 'Редактируется', index: 'editing', info_data: 'редактируется'},
+    {rutext: 'Опубликовано', index: 'published', info_data: 'опубликовано'},
+    {rutext: 'Используется', index: 'inuse', info_data: 'используется'},
     
     
 ]

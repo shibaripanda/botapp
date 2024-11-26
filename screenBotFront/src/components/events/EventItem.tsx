@@ -16,16 +16,23 @@ export function EventItem({text, leng, oneEvent, deleteEvent, updateEvent, setEv
   ]
 
   const butSection = () => {
-    if(oneEvent.status === 'use'){
+    if(oneEvent.status === 'public'){
       return buttonsSectionUse.map((item, index) => <Grid.Col key={index} span={12 / buttonsSectionUse.length}>{item}</Grid.Col>)
     }
     return buttonsSection.map((item, index) => <Grid.Col key={index} span={12 / buttonsSection.length}>{item}</Grid.Col>)
   }
 
+  const statusInfo = () => {
+    if(oneEvent.status === 'new') return text.new[leng]
+    else if(oneEvent.status === 'edit') return text.editing[leng]
+    else if(oneEvent.status === 'public') return text.published[leng]
+    else if(oneEvent.status === 'use') return text.inuse[leng]
+  }
+
   return (
     <Paper withBorder p="lg" radius="md" shadow="md">
       <Group justify="space-between" mb="xs">
-        <Text>{oneEvent.name}</Text>
+        <Text>{oneEvent.name + ' (' + statusInfo() + ')'}</Text>
       </Group>
 
       <Grid>

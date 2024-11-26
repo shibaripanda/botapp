@@ -9,12 +9,12 @@ import './layout.css'
 // import 'dayjs/locale/ru'
 // import dayjs from 'dayjs'
 // import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { ConnectPage } from './pages/ConnectPage'
-import { MainPage } from './pages/MainPage'
-import { BotEditPage } from './pages/BotEditPage'
-import { MonitPage } from './pages/MonitPage'
-import { ContentPage } from './pages/ContentPage'
-import { EventPage } from './pages/EventPage'
+import { ConnectPage } from './pages/ConnectPage.js'
+import { MainPage } from './pages/MainPage.js'
+import { BotEditPage } from './pages/BotEditPage.js'
+import { MonitPage } from './pages/MonitPage.js'
+import { ContentPage } from './pages/ContentPage.js'
+import { EventPage } from './pages/EventPage.tsx'
 
 import 'dayjs/locale/ru'
 import 'dayjs/locale/en'
@@ -45,6 +45,14 @@ import 'dayjs/locale/fi'
 import 'dayjs/locale/ro'
 import 'dayjs/locale/sk'
 import 'dayjs/locale/be'
+
+declare global {
+  interface Window {
+    textBotApp:any;
+    lengBotApp:any;
+    avlengBotApp:any;
+  }
+}
 
 // dayjs.extend(customParseFormat)
 

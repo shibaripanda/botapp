@@ -12,20 +12,23 @@ import { TextInputApp } from '../components/comps/TextInputApp.tsx'
 import { pipGetSocket } from '../socket/pipGetSocket.ts'
 import { pipSendSocket } from '../socket/pipSendSocket.ts'
 import axios from 'axios'
+import { EventStatus } from '../modules/tsEnums.ts'
 
-export function EventPage() {
+declare var process: any
+
+export function EventPage(){
+
   const navigate = useNavigate()
   useConnectSocket()
   const {botId} = useParams()
   const {botName} = useParams()
 
-  const [bot, setBot] = useState(false)
-  const [events, setEvents] = useState([])
+  const [bot, setBot] = useState<any>(false)
+  const [events, setEvents] = useState<any>([])
   const [filterEvents, setFilterEvents] = useState('')
   const [status, setStatus] = useState(false)
   const [eventName, setEventName] = useState('')
   const [checked, setChecked] = useState(false)
-
   const [text, setText] = useState(window.textBotApp ? window.textBotApp: false)
   const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : false)
 
@@ -59,7 +62,6 @@ export function EventPage() {
     }
   }
 
-
   useEffect(() => {
     console.log('test use')
     if(!sessionStorage.getItem('token')){
@@ -90,11 +92,10 @@ export function EventPage() {
       return events.filter(item => item.status === 'use').filter(item => item.name.toLowerCase().includes(filterEvents.toLowerCase()))
     }, [filterEvents, events, checked]
   )
-
   const newEventModule = {
     idEvent: Date.now() + 'Event',
     name: eventName,
-    status: 'open',
+    status: EventStatus.New,
     dateStartPeriod: [null, null],
     daysForDelete: [],
     checked: [0 ,1, 2, 3, 4, 5, 6],
@@ -105,7 +106,6 @@ export function EventPage() {
     checkedAll: false,
     days: []
   }
-  
   const func = {
     createEvent: async () => pipSendSocket('createEvent', {botId: bot._id, event: newEventModule}),
     deleteEvent: async (event) => pipSendSocket('deleteEvent', {botId: bot._id, event: event}),

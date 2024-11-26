@@ -7,7 +7,7 @@ export function SpesialListMenu({updateEvent, setNewScreenName, newScreenName, c
     console.log(events)
     const [opened, setOpened] = useState(false)
 
-    const menuItems = events.filter(item => item.status === 'open').map((item, index) => 
+    const menuItems = events.filter(item => item.status === 'public').map((item, index) => 
         
             <Menu.Item
                 key={index}

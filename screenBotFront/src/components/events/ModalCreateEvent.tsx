@@ -4,11 +4,12 @@ import { Modal, Grid, Paper, TextInput, Slider, Text, Checkbox, Accordion } from
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 import { TimeInput } from '@mantine/dates'
 import { DatePicker } from '@mantine/dates'
+import { EventStatus } from '../../modules/tsEnums.ts'
 
 interface EditedEvent {
   idEvent: string,
   name: string,
-  status: string,
+  status: EventStatus,
   dateStartPeriod: [Date | null, Date | null],
   daysForDelete: Date[],
   checked: number[],
@@ -34,16 +35,12 @@ interface Day {
 
 const getEditedEvent = (oneEvent) => {
   const res = structuredClone(oneEvent)
-  // console.log('Сравнение до:' , res === oneEvent)
-  // console.log('Сравнение до строки:' ,JSON.stringify(res) === JSON.stringify(oneEvent))
   res.days = res.days.map(item => ({...item, day: new Date(item.day)}))
   res.dateStartPeriod = res.dateStartPeriod.map(item => item ? new Date(item) : null)
   res.daysForDelete = res.daysForDelete.map(item => new Date(item))
   res.daysArrow =  res.daysArrow.map(item => new Date(item))
   res.currentEditDays = res.currentEditDays.map(item => new Date(item))
   res.referensDay = res.referensDay ? new Date(res.referensDay) : false
-  // console.log('Сравнение после:' , res === oneEvent)
-  // console.log('Сравнение после строки:' ,JSON.stringify(res) === JSON.stringify(oneEvent))
   return res
 }
 
@@ -63,9 +60,8 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent, setEvents})
   const [referensDay, setReferensDay] = useState<Date | false>(editedEvent.referensDay)
 
   useEffect(() => {
-    console.log('fvfv')
     if(JSON.stringify(oneEvent) !== JSON.stringify(natureEvent)){
-      console.log('rerender')
+      console.log(stat)
       const res = getEditedEvent(oneEvent)
       setEditedEvent(res)
       setDateStartPeriod(res.dateStartPeriod)
@@ -82,7 +78,6 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent, setEvents})
   useMemo(() => {
 
       if(dateStartPeriod[0] && dateStartPeriod[1]){
-        // console.log('MEMO')
         const result: Date[] = []
         const startTime = dateStartPeriod[0].getTime()
         const endTime = dateStartPeriod[1].getTime()
@@ -96,6 +91,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent, setEvents})
         editedEvent.daysArrow = res
         
         editedEvent.days = editedEvent.days.filter(item => res.map(item => item.getTime()).includes(item.day.getTime()))
+        editedEvent.status = EventStatus.Edit
         for(const i of res){
           const day = editedEvent.days.find(item => item.day.getTime() === i.getTime())
           if(!day){
@@ -523,12 +519,9 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent, setEvents})
   }
 
   const titleData = () => {
-    // console.log('titleData', JSON.stringify(oneEvent) === JSON.stringify(editedEvent))
-    // console.log(oneEvent)
-    // console.log(editedEvent)
     return (
       <Grid>
-        <Grid.Col span={4}>
+        <Grid.Col span={3.5}>
           <TextInput
             onChange={(event) => {
               editedEvent.name = event.currentTarget.value
@@ -539,8 +532,8 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent, setEvents})
             radius="sm"
             style={{marginBottom: '1vmax'}}
           />
-          </Grid.Col>
-          <Grid.Col span={4}>
+        </Grid.Col>
+        <Grid.Col span={3.5}>
           <div>
             {dateStartPeriod[0] ? dateStartPeriod[0].toLocaleDateString() : ''} {' - '}
             {dateStartPeriod[1] ? dateStartPeriod[1].toLocaleDateString() : ''} {' - '}
@@ -548,33 +541,33 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent, setEvents})
             </div>
         </Grid.Col>
         <Grid.Col span={2}>
-          <ButtonApp 
-              title={text.cancel[leng]} 
-              handler={() => {
-                setEditedEvent(getEditedEvent(oneEvent))
-                close()
-              }}
-              disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
+          <ButtonApp
+            color={'green'} 
+            title={text.public[leng]} 
+            handler={() => {
+              updateEvent(oneEvent, {...editedEvent, status: EventStatus.Public})
+              close()
+            }
+          }
+            disabled={!editedEvent.days.length || (JSON.stringify(oneEvent) !== JSON.stringify(editedEvent)) || !dateStartPeriod[1]}
             />
         </Grid.Col>
-        <Grid.Col span={2}>
+        <Grid.Col span={1.5}>
+          <ButtonApp 
+            title={text.cancel[leng]} 
+            handler={() => {
+              setEditedEvent(getEditedEvent(oneEvent))
+              close()
+            }}
+            disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
+            />
+        </Grid.Col>
+        <Grid.Col span={1.5}>
           <ButtonApp 
               title={text.save[leng]} 
               handler={() => {
                 updateEvent(oneEvent, editedEvent)
-                // setEvents([])
-                }
-                // {...editedEvent, 
-                // dateStartPeriod: dateStartPeriod, 
-                // daysForDelete: daysForDelete,
-                // checked: checked,
-                // referensDay: referensDay,
-                // currentEditDays: currentEditDays,
-                // daysArrow: daysArrow,
-                // checkedEdit: checkedEdit,
-                // checkedAll: checkedAll
-              // }
-              // )
+              }
             }
               disabled={JSON.stringify(oneEvent) === JSON.stringify(editedEvent)}
             />
