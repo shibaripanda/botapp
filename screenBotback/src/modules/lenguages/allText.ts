@@ -106,7 +106,6 @@ export const textArray: LengData[] = [
     {rutext: 'Опубликовано', index: 'published', info_data: 'опубликовано'},
     {rutext: 'Используется', index: 'inuse', info_data: 'используется'},
     
-    
 ]
 
 interface LengDataStart {

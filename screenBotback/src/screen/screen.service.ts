@@ -1,15 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose'
+import { BotService } from 'src/bot/bot.service';
+
+interface EventItem {
+    idEvent: string,
+    name: string,
+    status: string
+    dateStartPeriod: [],
+    daysForDelete: [],
+    checked: [],
+    referensDay: any,
+    currentEditDays: [],
+    daysArrow: [],
+    checkedEdit: [],
+    checkedAll: boolean,
+    days: []
+  }
 
 @Injectable()
 export class ScreenService {
 
     constructor(
-        @InjectModel('Screen') private botMongo: Model<Screen>) {}
+        @InjectModel('Screen') 
+            private screenMongo: Model<Screen>,
+            // private botService: BotService
+    ){}
 
         async createZeroScreen(_id: string){
-            await this.botMongo.create({
+            await this.screenMongo.create({
                 owner: _id, 
                 name: 'Start screen',
                 text: 'Hello, bot service is activated!',
@@ -19,7 +38,7 @@ export class ScreenService {
                 buttons: [],
                 protect: true
             })
-            await this.botMongo.create({
+            await this.screenMongo.create({
                 owner: _id, 
                 name: 'Error screen',
                 text: 'Error, oops!',
@@ -32,7 +51,7 @@ export class ScreenService {
         }
 
         async createNewScreen(botId: string, screenName: string){
-            await this.botMongo.create({
+            await this.screenMongo.create({
                 owner: botId, 
                 name: screenName,
                 text: '',
@@ -45,25 +64,37 @@ export class ScreenService {
             })
         }
 
-        async createEventScreen(botId: string, screenName: string, idEvent: string){
-            await this.botMongo.create({
-                owner: botId, 
-                name: screenName,
-                text: '',
-                media: [],
-                document: [],
-                audio: [],
-                buttons: [],
-                protect: true,
-                variable: '',
-                mode: 'event',
-                event: idEvent
-            })
+        async createEventScreen(userId: number, botId: string, screenName: string, idEvent: string){
+            
+            // const events: EventItem[] = await this.botService.getEvents(userId, botId)
+            // if(events.length){
+            //    const event: EventItem = events.find(item => item.idEvent === idEvent)
+
+            //    console.log(event)
+               
+            //     // await this.screenMongo.create({
+            //     // owner: botId, 
+            //     // name: screenName,
+            //     // text: '',
+            //     // media: [],
+            //     // document: [],
+            //     // audio: [],
+            //     // buttons: [],
+            //     // protect: true,
+            //     // variable: '',
+            //     // mode: 'event',
+            //     // event: idEvent,
+            //     // idEvent: string,
+            //     // nameEvent: string,
+            //     // statusEvent: string,
+            //     // days: []
+            // // })
+            // }
         }
 
         async copyScreen(botId: string, screenId: string){
-            const screen = await this.botMongo.findOne({owner: botId, _id: screenId})
-            await this.botMongo.create({
+            const screen = await this.screenMongo.findOne({owner: botId, _id: screenId})
+            await this.screenMongo.create({
                 owner: botId, 
                 name: screen['name'] + ' (copy) ' + Date.now(),
                 text: screen['text'],
@@ -77,63 +108,63 @@ export class ScreenService {
         }
 
         async deleteScreen(id: string){
-            await this.botMongo.deleteOne({_id: id})
+            await this.screenMongo.deleteOne({_id: id})
         }
 
         async getScreens(owner: string){
-            const screens = await this.botMongo.find({owner: owner})
+            const screens = await this.screenMongo.find({owner: owner})
             return screens
         }
 
         async clearScreen(owner: string, _id: string){
-            await this.botMongo.updateOne({owner: owner, _id: _id}, {text: '', media: [], document: [], audio: [], buttons: []})
+            await this.screenMongo.updateOne({owner: owner, _id: _id}, {text: '', media: [], document: [], audio: [], buttons: []})
         }
 
         async addContentItem(owner: string, _id: string, content: string){
             console.log('ddd')
             console.log(content['type'])
             if(content['type'] === 'text'){
-                await this.botMongo.updateOne({owner: owner, _id: _id}, {text: content['media']})
+                await this.screenMongo.updateOne({owner: owner, _id: _id}, {text: content['media']})
             }
             else if(['photo', 'video'].includes(content['type'])){
-                await this.botMongo.updateOne({owner: owner, _id: _id}, {$addToSet: {media: content}}) 
-                const res = await this.botMongo.findOne({owner: owner, _id: _id}, {media: 1})
+                await this.screenMongo.updateOne({owner: owner, _id: _id}, {$addToSet: {media: content}}) 
+                const res = await this.screenMongo.findOne({owner: owner, _id: _id}, {media: 1})
                 if(res['media'].length > 9){
                     res['media'].splice(0, 1)
-                    await this.botMongo.updateOne({owner: owner, _id: _id}, {media: res['media']})
+                    await this.screenMongo.updateOne({owner: owner, _id: _id}, {media: res['media']})
                 }
             }
             else{
-                await this.botMongo.updateOne({owner: owner, _id: _id}, {$addToSet: {[content['type']]: content}})
-                const res = await this.botMongo.findOne({owner: owner, _id: _id}, {[content['type']]: 1})
+                await this.screenMongo.updateOne({owner: owner, _id: _id}, {$addToSet: {[content['type']]: content}})
+                const res = await this.screenMongo.findOne({owner: owner, _id: _id}, {[content['type']]: 1})
                 if(res[content['type']].length > 9){
                     res[content['type']].splice(0, 1)
-                    await this.botMongo.updateOne({owner: owner, _id: _id}, {[content['type']]: res[content['type']]})
+                    await this.screenMongo.updateOne({owner: owner, _id: _id}, {[content['type']]: res[content['type']]})
                 }
             }
         }
 
         async deleteContentItem(owner: string, _id: string, content: string, index: number){
-            await this.botMongo.updateOne({owner: owner, _id: _id}, {$pull: {[content]: index}})
+            await this.screenMongo.updateOne({owner: owner, _id: _id}, {$pull: {[content]: index}})
         }
 
         async editScreenName(owner: string, _id: string, name: string){
-            await this.botMongo.updateOne({owner: owner, _id: _id}, {name: name})
+            await this.screenMongo.updateOne({owner: owner, _id: _id}, {name: name})
         }
 
         async editButtons(owner: string, _id: string, buttons: []){
-            await this.botMongo.updateOne({owner: owner, _id: _id}, {buttons: buttons})
+            await this.screenMongo.updateOne({owner: owner, _id: _id}, {buttons: buttons})
         }
 
         async updateVariable(owner: string, _id: string, variable: string){
-            await this.botMongo.updateOne({owner: owner, _id: _id}, {variable: variable})
+            await this.screenMongo.updateOne({owner: owner, _id: _id}, {variable: variable})
         }
 
         async screenForAnswer(owner: string, _id: string, ansScreen: string){
-            await this.botMongo.updateOne({owner: owner, _id: _id}, {ansScreen: ansScreen})
+            await this.screenMongo.updateOne({owner: owner, _id: _id}, {ansScreen: ansScreen})
         }
 
         async protectScrreen(owner: string, _id: string, status: boolean){
-            await this.botMongo.updateOne({owner: owner, _id: _id}, {protect: status})
+            await this.screenMongo.updateOne({owner: owner, _id: _id}, {protect: status})
         }
 }

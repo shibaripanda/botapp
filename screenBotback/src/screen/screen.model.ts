@@ -39,12 +39,12 @@ export const ScreenSchema = new mongoose.Schema({
     type: String,
     required: true,
     default: 'simple'
-},
-  // status: {
-  //     type: Boolean,
-  //     required: true,
-  //     default: true
-  // }
+  },
+  idEvent: {
+    type: String,
+    required: true,
+    default: 'zero'
+  }
 }, {timestamps: true})
 
 export interface Screen {

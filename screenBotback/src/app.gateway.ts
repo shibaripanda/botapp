@@ -1,4 +1,3 @@
-// import { UseGuards } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -7,12 +6,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-// import { AppService } from 'src/app.service';
-// import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { UsersService } from './users/users.service';
-import { BotService } from './bot/bot.service';
-// import { CreateMessDto } from 'src/dto/create-mess.dto';
+import { Server, Socket } from 'socket.io'
 
 @WebSocketGateway(
   {
@@ -25,12 +19,8 @@ import { BotService } from './bot/bot.service';
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
-    private usersService: UsersService,
-    private botSevice: BotService
   ) {}
 
-  
-  
   @WebSocketServer() server: Server;
 
   @SubscribeMessage('helloFromServer')

@@ -10,26 +10,26 @@ import { lengs, textArray } from './modules/lenguages/allText';
 export class AppService {
 
   constructor(
-    @InjectModel('App') private botMongo: Model<App>) {}
+    @InjectModel('App') private appMongo: Model<App>) {}
 
     async onApplicationBootstrap() {
       await this.updateAppText()
     }
 
   async getText(): Promise<NewLengPack>{
-    const app = await this.botMongo.findOne({mainServerAppSettings: 'mainServerAppSettings'}, {text: 1, _id: 0})
+    const app = await this.appMongo.findOne({mainServerAppSettings: 'mainServerAppSettings'}, {text: 1, _id: 0})
     return app.text
   }
 
   async getMainServerAppSettings(){
-    return await this.botMongo.findOneAndUpdate({mainServerAppSettings: 'mainServerAppSettings'}, {$inc: {restartCount: 1}}, {upsert: true, returnDocument: 'after'})
+    return await this.appMongo.findOneAndUpdate({mainServerAppSettings: 'mainServerAppSettings'}, {$inc: {restartCount: 1}}, {upsert: true, returnDocument: 'after'})
   }
 
   async updateAppText(){
     const app = await this.getMainServerAppSettings()
     const newAppText = await getLenguagesFromAI(false, textArray, lengs, app.text)
     if(JSON.stringify(app.text) !== JSON.stringify(newAppText)){
-      await this.botMongo.findOneAndUpdate({mainServerAppSettings: 'mainServerAppSettings'}, {text: newAppText})
+      await this.appMongo.findOneAndUpdate({mainServerAppSettings: 'mainServerAppSettings'}, {text: newAppText})
       console.log('Текс обновлен')
     }
     else{

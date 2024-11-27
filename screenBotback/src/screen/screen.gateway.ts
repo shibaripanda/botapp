@@ -7,7 +7,6 @@ import {
 import { Server, Socket } from 'socket.io'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { ScreenService } from '../screen/screen.service'
-import { BotService } from 'src/bot/bot.service'
 
 @WebSocketGateway(
   {
@@ -20,8 +19,7 @@ import { BotService } from 'src/bot/bot.service'
 export class ScreenGateway {
 
   constructor(
-    private screenSevice: ScreenService,
-    private botSevice: BotService
+    private screenSevice: ScreenService
   ) {}
 
   
@@ -106,7 +104,8 @@ export class ScreenGateway {
   @UseGuards(JwtAuthGuard)
   @SubscribeMessage('createEventScreen')
   async createEventScreen(client: Socket, payload: any): Promise<void> {
-    await this.screenSevice.createEventScreen(payload.botId, payload.screenName, payload.idEvent)
+    const user = client['user']
+    await this.screenSevice.createEventScreen(user.id, payload.botId, payload.screenName, payload.idEvent)
     const res = await this.screenSevice.getScreens(payload.botId)
     this.server.to(client.id).emit('getScreens', res)
   }

@@ -8,13 +8,11 @@ export class AppController {
 
   @Get('/text')
   getText(){
-    console.log('text')
     return this.appService.getText()
   }
 
   @Get('/avleng')
   getAvleng(): any{
-    console.log('avleng')
     return lengs
   }
 
