@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose'
 import { BotService } from 'src/bot/bot.service';
+import { EventService } from 'src/event/event.service';
 
 interface EventItem {
     idEvent: string,
@@ -24,7 +25,10 @@ export class ScreenService {
     constructor(
         @InjectModel('Screen') 
             private screenMongo: Model<Screen>,
-            // private botService: BotService
+            @Inject(forwardRef(() => BotService))
+            private botService: BotService,
+            @Inject(forwardRef(() => EventService))
+            private eventService: EventService
     ){}
 
         async createZeroScreen(_id: string){
@@ -66,30 +70,34 @@ export class ScreenService {
 
         async createEventScreen(userId: number, botId: string, screenName: string, idEvent: string){
             
-            // const events: EventItem[] = await this.botService.getEvents(userId, botId)
-            // if(events.length){
-            //    const event: EventItem = events.find(item => item.idEvent === idEvent)
+            const events: EventItem[] = await this.botService.getEvents(userId, botId)
+            if(events.length){
+               const event: EventItem = events.find(item => item.idEvent === idEvent)
 
-            //    console.log(event)
+               const newEvent = await this.eventService.createEvent({
+                                                                    name: event.name, 
+                                                                    owner: botId, 
+                                                                    idEvent: event.idEvent, 
+                                                                    days: event.days, 
+                                                                    dateStartAndStop: event.dateStartPeriod
+                                                                })
+
+               console.log(newEvent)
                
-            //     // await this.screenMongo.create({
-            //     // owner: botId, 
-            //     // name: screenName,
-            //     // text: '',
-            //     // media: [],
-            //     // document: [],
-            //     // audio: [],
-            //     // buttons: [],
-            //     // protect: true,
-            //     // variable: '',
-            //     // mode: 'event',
-            //     // event: idEvent,
-            //     // idEvent: string,
-            //     // nameEvent: string,
-            //     // statusEvent: string,
-            //     // days: []
-            // // })
-            // }
+                await this.screenMongo.create({
+                owner: botId, 
+                name: screenName,
+                text: '',
+                media: [],
+                document: [],
+                audio: [],
+                buttons: [],
+                protect: true,
+                variable: '',
+                mode: 'event',
+                event_id: newEvent._id
+            })
+            }
         }
 
         async copyScreen(botId: string, screenId: string){

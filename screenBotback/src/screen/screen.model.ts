@@ -40,7 +40,7 @@ export const ScreenSchema = new mongoose.Schema({
     required: true,
     default: 'simple'
   },
-  idEvent: {
+  event_id: {
     type: String,
     required: true,
     default: 'zero'

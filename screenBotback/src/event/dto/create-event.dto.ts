@@ -1,6 +1,7 @@
 export class CreateEventDto {
+    readonly owner: string
     readonly idEvent: string
     readonly name: string
-    readonly status: string
+    readonly dateStartAndStop: []
     readonly days: []
 }

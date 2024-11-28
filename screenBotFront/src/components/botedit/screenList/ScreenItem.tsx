@@ -111,7 +111,7 @@ export function ScreenItem({text, leng, addContentItem, content, deleteContentIt
           deleteContentItem={deleteContentItem}
           addContentItem={addContentItem}
         />
-        <Button variant="default" size="xs"
+        <Button variant="default" size="xs" disabled={screen.mode === 'event'}
           onClick={() => {
             copyScreen(screen._id)
           }}>

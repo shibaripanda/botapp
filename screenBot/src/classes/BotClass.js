@@ -2,6 +2,8 @@ import { Markup } from "telegraf"
 import { Screen } from "../models/screen.js"
 import { AppClass } from "./AppClass.js"
 import { SocketApt } from "../socket/api/socket-api.js"
+import { MyEvent } from "../models/event.js"
+import { EventClass } from "./EventClass.js"
 
 export class BotClass {
 
@@ -16,12 +18,23 @@ export class BotClass {
         this.mode = data.mode
     }
 
+    async getEvent(id){
+        return await MyEvent.findOne({_id: id, owner: this._id})
+    }
+
     async updateBotData(){
         const app = new AppClass()
         this.mode = (await app.getBot(this._id)).mode
     }
 
     async message(screen, userId, userData){
+
+        if(screen.mode === 'event'){
+            const event = new EventClass(await this.getEvent(screen.event_id), this._id)
+            console.log(await event.getKeyboardEventYears())
+        }
+
+    
         if(userData){
             for(const key in userData){
                 screen.text = screen.text.replaceAll(`<$>${key}<$>`, userData[key])

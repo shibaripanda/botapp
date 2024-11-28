@@ -37,11 +37,14 @@ const screenSchema = new Schema({
         required: true,
         default: true
     },
-    // status: {
-    //     type: Boolean,
-    //     required: true,
-    //     default: true
-    // }
+    mode: {
+        type: String,
+        required: true,
+        default: 'zero'
+    },
+    event_id: {
+        type: String
+    }
 }, { timestamps: true});
 
 
