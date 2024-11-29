@@ -2,6 +2,7 @@
 export class EventClass {
 
     constructor(event, sceenId) {
+        this.event = event
         this.owner = event.owner
         this.name = event.name,
         this.idEvent = event.idEvent,
@@ -27,7 +28,6 @@ export class EventClass {
         }
         return keyboardsYears
     }
-
     async getKeyboardEventMounth(year){
 
         const mounths = [...new Set(await this.days.filter(item => (new Date(item.day)).getFullYear() === Number(year)).map(item => (new Date(item.day)).getMonth()))]
@@ -43,7 +43,6 @@ export class EventClass {
         }
         return [[{text: 'back', to: this.sceenId, action: 'callback'}]].concat(keyboardsMounths)
     }
-
     async getKeyboardEventDays(year, mounth){
 
         const dayList = await this.days.filter(item => (new Date(item.day)).getFullYear() === Number(year) && (new Date(item.day)).getMonth() === Number(mounth))
@@ -59,17 +58,44 @@ export class EventClass {
         }
         return [[{text: 'back', to: this.sceenId, action: 'callback'}]].concat(keyboardDays)
     }
+    async getKeyboardEventSlots(year, mounth, day){
 
+        const slots = (await this.days.filter(item => (new Date(item.day)).getFullYear() === Number(year) && (new Date(item.day)).getMonth() === Number(mounth) && (new Date(item.day)).getDate() === Number(day)))[0].slots
+        const keyboardSlots = []
+        for(const i of slots){
+            if(i.openForRegistration){
+                keyboardSlots.push([{text: i.startTime + ` (${day}, ${mounth}, ${year})`, to: `${this.sceenId}|prereg|${year}|${mounth}|${day}|${i.startTime}`, action: 'callback'}])
+            }
+            else{
+                keyboardSlots.push([{text: i.startTime + ` (${day}, ${mounth}, ${year}) ` + '🔒', to: `zero`, action: 'callback'}])
+            }
+        }
+        return [[{text: 'back', to: this.sceenId, action: 'callback'}]].concat(keyboardSlots)
+    }
 
+    async getKeyboardEventPreReg(year, mounth, day, slotTime){
 
+        const slots = (await this.days.filter(item => (new Date(item.day)).getFullYear() === Number(year) && (new Date(item.day)).getMonth() === Number(mounth) && (new Date(item.day)).getDate() === Number(day)))[0]
+        const keyboardSlots = []
 
-        
-        // console.log([...new Set(mounths)].map(item => ([{text: item, to: `${this._id}|to_day|${item}`, action: 'callback'}])))
-        
-        // const m = 11
-        // const days = await this.days.filter(item => (new Date(item.day)).getFullYear() === y && (new Date(item.day)).getMonth() === m).map(item => (new Date(item.day)).getDay())
-        // console.log(days.map(item => ([{text: item, to: `${this._id}|to_slot|${item}`, action: 'callback'}])))
+        const a = slots.slots.findIndex(item => item.startTime === slotTime)
+        const b = slots.day
 
+        console.log(this.event.days[0].slots)
+
+        const x = await this.event.updateOne(
+            {_id: this._id},
+            { $addToSet: { 'days.$[xl].slots.$[el].clients': 4545454545 } },
+            {
+               arrayFilters: [{ 'el.startTime': slotTime,  'xl.day': b }],
+               new: true
+            }
+         )
+
+         console.log(x)
+
+        return [[{text: 'back', to: this.sceenId, action: 'callback'}]].concat(keyboardSlots)
+    }
     
 
 }

@@ -6,8 +6,8 @@ export const botCallback = async (botModule) => {
             // console.log(ctx.update.update_id)
 
             const screen = await botModule.getScreen(ctx.update.callback_query.data.split('|')[0])
-            console.log(screen)
-            console.log(ctx.update.callback_query.data.split('|')[0]) 
+            // console.log(screen)
+            // console.log(ctx.update.callback_query.data.split('|')[0]) 
             if(screen){
                 const user = await getUser(ctx.from, botModule._id)
                 await botModule.message(screen, ctx.update.callback_query.from.id, user.data, ctx.update.callback_query.data.split('|'))

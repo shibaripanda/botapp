@@ -28,8 +28,6 @@ export class BotClass {
     }
 
     async message(screen, userId, userData, toData){
-        console.log(toData)
-        // console.log(screen)
 
         let eventKeyboard = []
 
@@ -43,6 +41,26 @@ export class BotClass {
                 else if(toData[1] === 'to_days'){
                     console.log('to_days')
                     eventKeyboard = await event.getKeyboardEventDays(toData[2], toData[3]) 
+                }
+                else if(toData[1] === 'to_slots'){
+                    console.log('to_slots')
+                    eventKeyboard = await event.getKeyboardEventSlots(toData[2], toData[3], toData[4]) 
+                }
+                else if(toData[1] === 'prereg'){
+                    console.log('prereg')
+                    eventKeyboard = await event.getKeyboardEventPreReg(toData[2], toData[3], toData[4], toData[5]) 
+                }
+                else if(toData[1] === 'reg'){
+                    console.log('reg')
+                    eventKeyboard = await event.regEvent(toData[2], toData[3], toData[4], toData[5]) 
+                }
+                else if(toData[1] === 'donereg'){
+                    console.log('donereg')
+                    eventKeyboard = await event.doneRegEvent(toData[2], toData[3], toData[4], toData[5]) 
+                }
+                else if(toData[1] === 'falsereg'){
+                    console.log('falsereg')
+                    eventKeyboard = await event.falseRegEvent(toData[2], toData[3], toData[4], toData[5]) 
                 }
                 else{
                     console.log('to_years')
@@ -72,7 +90,6 @@ export class BotClass {
                 for(const i of eventKeyboard.concat(screen.buttons)){
                     res.push(i.map(item => Markup.button[item.action](item.text, item.to)))
                 }
-                console.log(res)
                 return Markup.inlineKeyboard(res) 
             }
         }
