@@ -12,7 +12,21 @@ export function ScreenItem({text, leng, addContentItem, content, deleteContentIt
   }
 
   const startScreen = () => {
-    if(!['Start screen', 'Error screen'].includes(screen.name)){
+    if(['Start screen', 'Error screen'].includes(screen.name) || usedCount() > 0){
+      // return (
+      //   <Group justify="flex-end" mt="md" grow>
+      //     <TextInput
+      //       size="xs"
+      //       placeholder={text.screenNameForDelete[leng]}
+      //       value={deleteValue}
+      //       onChange={(event) => {
+      //         setDeleteValue(event.currentTarget.value)
+      //       }}
+      //     />
+      //   </Group>
+      // )
+    }
+    else{
       return (
         <Group justify="flex-end" mt="md" grow>
           <TextInput

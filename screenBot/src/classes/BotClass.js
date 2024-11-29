@@ -27,12 +27,34 @@ export class BotClass {
         this.mode = (await app.getBot(this._id)).mode
     }
 
-    async message(screen, userId, userData){
+    async message(screen, userId, userData, toData){
+        console.log(toData)
+        // console.log(screen)
+
+        let eventKeyboard = []
 
         if(screen.mode === 'event'){
-            const event = new EventClass(await this.getEvent(screen.event_id), this._id)
-            console.log(await event.getKeyboardEventYears())
+            const event = new EventClass(await this.getEvent(screen.event_id), screen._id)
+            if(toData){
+                if(toData[1] === 'to_mounth'){
+                    console.log('to_mounth')
+                    eventKeyboard = await event.getKeyboardEventMounth(toData[2]) 
+                }
+                else if(toData[1] === 'to_days'){
+                    console.log('to_days')
+                    eventKeyboard = await event.getKeyboardEventDays(toData[2], toData[3]) 
+                }
+                else{
+                    console.log('to_years')
+                    eventKeyboard = await event.getKeyboardEventYears() 
+                }
+                
+            }
+            else{
+                eventKeyboard = await event.getKeyboardEventYears()
+            }
         }
+        
 
     
         if(userData){
@@ -45,11 +67,12 @@ export class BotClass {
         }
 
         const keyboard = () => {
-            if(screen.buttons.length){
+            if(screen.buttons.length || eventKeyboard.length){
                const res = []
-                for(const i of screen.buttons){
+                for(const i of eventKeyboard.concat(screen.buttons)){
                     res.push(i.map(item => Markup.button[item.action](item.text, item.to)))
                 }
+                console.log(res)
                 return Markup.inlineKeyboard(res) 
             }
         }
