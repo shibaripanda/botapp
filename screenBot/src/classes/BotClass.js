@@ -28,7 +28,6 @@ export class BotClass {
     }
 
     async message(screen, userId, userData, toData){
-
         let eventKeyboard = []
 
         if(screen.mode === 'event'){
@@ -48,20 +47,20 @@ export class BotClass {
                 }
                 else if(toData[1] === 'prereg'){
                     console.log('prereg')
-                    eventKeyboard = await event.getKeyboardEventPreReg(toData[2], toData[3], toData[4], toData[5]) 
+                    eventKeyboard = await event.getKeyboardEventPreReg(toData[2], toData[3], toData[4], toData[5], userId) 
                 }
                 else if(toData[1] === 'reg'){
                     console.log('reg')
-                    eventKeyboard = await event.regEvent(toData[2], toData[3], toData[4], toData[5]) 
+                    eventKeyboard = await event.regEvent(toData[2], toData[3], toData[4], toData[5], userId) 
                 }
-                else if(toData[1] === 'donereg'){
-                    console.log('donereg')
-                    eventKeyboard = await event.doneRegEvent(toData[2], toData[3], toData[4], toData[5]) 
-                }
-                else if(toData[1] === 'falsereg'){
-                    console.log('falsereg')
-                    eventKeyboard = await event.falseRegEvent(toData[2], toData[3], toData[4], toData[5]) 
-                }
+                // else if(toData[1] === 'donereg'){
+                //     console.log('donereg')
+                //     eventKeyboard = await event.doneRegEvent(toData[2], toData[3], toData[4], toData[5]) 
+                // }
+                // else if(toData[1] === 'falsereg'){
+                //     console.log('falsereg')
+                //     eventKeyboard = await event.falseRegEvent(toData[2], toData[3], toData[4], toData[5]) 
+                // }
                 else{
                     console.log('to_years')
                     eventKeyboard = await event.getKeyboardEventYears() 

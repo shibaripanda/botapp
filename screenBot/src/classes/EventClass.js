@@ -1,3 +1,4 @@
+import { MyEvent } from "../models/event.js"
 
 export class EventClass {
 
@@ -73,28 +74,138 @@ export class EventClass {
         return [[{text: 'back', to: this.sceenId, action: 'callback'}]].concat(keyboardSlots)
     }
 
-    async getKeyboardEventPreReg(year, mounth, day, slotTime){
+    async getKeyboardEventPreReg(year, mounth, day, slotTime, userId){
 
-        const slots = (await this.days.filter(item => (new Date(item.day)).getFullYear() === Number(year) && (new Date(item.day)).getMonth() === Number(mounth) && (new Date(item.day)).getDate() === Number(day)))[0]
-        const keyboardSlots = []
+        const slots = (await this.event.days.filter(item => (new Date(item.day)).getFullYear() === Number(year) && (new Date(item.day)).getMonth() === Number(mounth) && (new Date(item.day)).getDate() === Number(day)))[0]
 
         const a = slots.slots.findIndex(item => item.startTime === slotTime)
         const b = slots.day
 
-        console.log(this.event.days[0].slots)
+        let clients = this.event.days.find(item => item.day === b).slots[a].clients
+        let maxClients = this.event.days.find(item => item.day === b).slots[a].maxClients
 
-        const x = await this.event.updateOne(
-            {_id: this._id},
-            { $addToSet: { 'days.$[xl].slots.$[el].clients': 4545454545 } },
-            {
-               arrayFilters: [{ 'el.startTime': slotTime,  'xl.day': b }],
-               new: true
+        for(const i of clients){
+            if(i.time + 300000 < Date.now() && i.status === 'prereg'){
+                const link = `days.$[el].slots.${a}.clients`
+                this.event = await MyEvent.findByIdAndUpdate(
+                    {_id: this._id},
+                    {$pull: {[link]: i}},
+                    {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
+                )
+                const linkReg = `days.$[el].slots.${a}.openForRegistration`
+                this.event = await MyEvent.findByIdAndUpdate(
+                    {_id: this._id},
+                    {$set: {[linkReg]: true}},
+                    {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
+                )  
             }
-         )
+        }
 
-         console.log(x)
+        clients = this.event.days.find(item => item.day === b).slots[a].clients
+        maxClients = this.event.days.find(item => item.day === b).slots[a].maxClients
 
-        return [[{text: 'back', to: this.sceenId, action: 'callback'}]].concat(keyboardSlots)
+        if(clients.length === maxClients){
+            const linkReg = `days.$[el].slots.${a}.openForRegistration`
+            this.event = await MyEvent.findByIdAndUpdate(
+                {_id: this._id},
+                {$set: {[linkReg]: false}},
+                {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
+            ) 
+            return await this.getKeyboardEventSlots(year, mounth, day)
+        }
+        else{
+            const link = `days.$[el].slots.${a}.clients`
+            this.event = await MyEvent.findByIdAndUpdate(
+                {_id: this._id},
+                {$addToSet: {[link]: {user: userId, time: Date.now(), status: 'prereg'}}},
+                {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
+            )
+            clients = this.event.days.find(item => item.day === b).slots[a].clients
+            maxClients = this.event.days.find(item => item.day === b).slots[a].maxClients
+            if(clients.length === maxClients){
+                const linkReg = `days.$[el].slots.${a}.openForRegistration`
+                this.event = await MyEvent.findByIdAndUpdate(
+                    {_id: this._id},
+                    {$set: {[linkReg]: false}},
+                    {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
+                )
+            }
+            return [[{text: '✅ ' + slotTime + ` (${day}, ${mounth}, ${year})`, to: `${this.sceenId}|reg|${year}|${mounth}|${day}|${slotTime}`, action: 'callback'}], [{text: '❌', to: this.sceenId, action: 'callback'}]]
+        }
+
+    }
+    async regEvent(year, mounth, day, slotTime, userId){
+
+        const slots = (await this.event.days.filter(item => (new Date(item.day)).getFullYear() === Number(year) && (new Date(item.day)).getMonth() === Number(mounth) && (new Date(item.day)).getDate() === Number(day)))[0]
+
+        const a = slots.slots.findIndex(item => item.startTime === slotTime)
+        const b = slots.day
+
+        let clients = this.event.days.find(item => item.day === b).slots[a].clients
+        let maxClients = this.event.days.find(item => item.day === b).slots[a].maxClients
+
+        for(const i of clients){
+            if(i.time + 300000 < Date.now() && i.status === 'prereg'){
+                const link = `days.$[el].slots.${a}.clients`
+                this.event = await MyEvent.findByIdAndUpdate(
+                    {_id: this._id},
+                    {$pull: {[link]: i}},
+                    {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
+                )
+                const linkReg = `days.$[el].slots.${a}.openForRegistration`
+                this.event = await MyEvent.findByIdAndUpdate(
+                    {_id: this._id},
+                    {$set: {[linkReg]: true}},
+                    {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
+                )  
+            }
+        }
+
+        clients = this.event.days.find(item => item.day === b).slots[a].clients
+        maxClients = this.event.days.find(item => item.day === b).slots[a].maxClients
+
+        if(clients.find(item => item.user === userId && item.status === 'prereg')){
+            const index = clients.findIndex(item => item.user === userId && item.status === 'prereg')
+            const link = `days.$[el].slots.${a}.clients.${index}.status`
+            this.event = await MyEvent.findByIdAndUpdate(
+                {_id: this._id},
+                {$set: {[link]: 'reg'}},
+                {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
+            ) 
+        }
+        else{
+            if(clients.length === maxClients){
+                const linkReg = `days.$[el].slots.${a}.openForRegistration`
+                this.event = await MyEvent.findByIdAndUpdate(
+                    {_id: this._id},
+                    {$set: {[linkReg]: false}},
+                    {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
+                ) 
+                console.log('1')
+                return await this.getKeyboardEventSlots(year, mounth, day)
+            }
+            else{
+                console.log('2')
+                const link = `days.$[el].slots.${a}.clients`
+                this.event = await MyEvent.findByIdAndUpdate(
+                    {_id: this._id},
+                    {$addToSet: {[link]: {user: userId, time: Date.now(), status: 'reg'}}},
+                    {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
+                )
+                clients = this.event.days.find(item => item.day === b).slots[a].clients
+                maxClients = this.event.days.find(item => item.day === b).slots[a].maxClients
+                if(clients.length === maxClients){
+                    const linkReg = `days.$[el].slots.${a}.openForRegistration`
+                    this.event = await MyEvent.findByIdAndUpdate(
+                        {_id: this._id},
+                        {$set: {[linkReg]: false}},
+                        {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
+                    )
+                }
+            }
+        }
+        return [[{text: 'Done! ✅', to: this.sceenId, action: 'callback'}]]
+
     }
     
 
