@@ -32,10 +32,11 @@ export class BotClass {
 
         if(screen.mode === 'event'){
             const event = new EventClass(await this.getEvent(screen.event_id), screen._id)
+            console.log(toData)
             if(toData){
                 if(toData[1] === 'to_mounth'){
                     console.log('to_mounth')
-                    eventKeyboard = await event.getKeyboardEventMounth(toData[2]) 
+                    eventKeyboard = await event.getKeyboardEventMounth(toData[2])
                 }
                 else if(toData[1] === 'to_days'){
                     console.log('to_days')
@@ -63,7 +64,33 @@ export class BotClass {
                 // }
                 else{
                     console.log('to_years')
-                    eventKeyboard = await event.getKeyboardEventYears() 
+                    eventKeyboard = await event.getKeyboardEventYears()
+                    console.log(0)
+                    console.log(eventKeyboard)
+
+                    if(eventKeyboard.length === 1 && eventKeyboard[0][0].to !== 'zero'){
+                        eventKeyboard = await event.getKeyboardEventMounth(eventKeyboard[0][0].text)
+
+                        console.log(1)
+                        console.log(eventKeyboard)
+
+                        if(eventKeyboard.length === 2 && eventKeyboard[1][0].to !== 'zero'){
+                            const link = eventKeyboard[1][0].to.split('|')
+                            eventKeyboard = await event.getKeyboardEventDays(link[2], link[3])
+
+                            console.log(2)
+                            console.log(eventKeyboard)
+
+                            if(eventKeyboard.length === 2 && eventKeyboard[1][0].to !== 'zero'){
+                                const link = eventKeyboard[1][0].to.split('|')
+                                eventKeyboard = await event.getKeyboardEventSlots(link[2], link[3], link[4])
+
+                                console.log(3)
+                                console.log(eventKeyboard)
+                            }
+                        }
+                    } 
+
                 }
                 
             }
