@@ -27,32 +27,67 @@ export class BotClass {
         this.mode = (await app.getBot(this._id)).mode
     }
 
+    async findUserReg(days, userId){
+        const res = []
+        for(const i of days){
+            const slots = i.slots.map(item => ({cli: item.clients, startTime: item.startTime}))
+            for(const y of slots){
+                const eventReg = y.cli.filter(item => item.user === userId && item.status === 'reg')
+                if(eventReg.length){
+                    for(const x of eventReg){
+                        res.push({day: i.day, start: y.startTime, ...x})
+                    }
+                } 
+            }
+        }
+        let evList = ''
+        for(const ev of res.sort((a, b) => a.time - b.time)){
+            const time = new Date(ev.day)
+            evList = evList + '⏰ ' + time.getDate() + '.' + (time.getMonth() + 1) + '.' + time.getFullYear() + ' ' + ev.start  + ' ✅' + '\n'
+
+        }
+        return evList
+    }
+
     async message(screen, userId, userData, toData){
         let eventKeyboard = []
 
         if(screen.mode === 'event'){
             const event = new EventClass(await this.getEvent(screen.event_id), screen._id)
-            console.log(toData)
+
+            screen.text = screen.text + ' \n' + await this.findUserReg(event.days, userId)
+
             if(toData){
                 if(toData[1] === 'to_mounth'){
                     console.log('to_mounth')
-                    eventKeyboard = await event.getKeyboardEventMounth(toData[2])
+                    const res = await event.getKeyboardEventMounth(toData[2])
+                    screen.text = screen.text + `\n\n⏰ ` + res.text
+                    eventKeyboard = res.keyboard
                 }
                 else if(toData[1] === 'to_days'){
                     console.log('to_days')
-                    eventKeyboard = await event.getKeyboardEventDays(toData[2], toData[3]) 
+                    const res = await event.getKeyboardEventDays(toData[2], toData[3])
+                    screen.text = screen.text + `\n\n⏰ ` + res.text
+                    eventKeyboard = res.keyboard 
                 }
                 else if(toData[1] === 'to_slots'){
                     console.log('to_slots')
-                    eventKeyboard = await event.getKeyboardEventSlots(toData[2], toData[3], toData[4]) 
+                    const res = await event.getKeyboardEventSlots(toData[2], toData[3], toData[4])
+                    screen.text = screen.text + `\n\n⏰ ` + res.text
+                    eventKeyboard = res.keyboard 
                 }
                 else if(toData[1] === 'prereg'){
                     console.log('prereg')
-                    eventKeyboard = await event.getKeyboardEventPreReg(toData[2], toData[3], toData[4], toData[5], userId) 
+                    const res = await event.getKeyboardEventPreReg(toData[2], toData[3], toData[4], toData[5], userId)
+                    screen.text = screen.text + `\n\n⏰ ` + res.text
+                    eventKeyboard = res.keyboard 
                 }
                 else if(toData[1] === 'reg'){
                     console.log('reg')
-                    eventKeyboard = await event.regEvent(toData[2], toData[3], toData[4], toData[5], userId) 
+                    const res = await event.regEvent(toData[2], toData[3], toData[4], toData[5], userId)
+                    screen.text = screen.text + `\n\n⏰ ` + res.text
+                    eventKeyboard = res.keyboard
+                     
                 }
                 // else if(toData[1] === 'donereg'){
                 //     console.log('donereg')
@@ -64,26 +99,35 @@ export class BotClass {
                 // }
                 else{
                     console.log('to_years')
-                    eventKeyboard = await event.getKeyboardEventYears()
-                    console.log(0)
-                    console.log(eventKeyboard)
+                    const res = await event.getKeyboardEventYears()
+                    screen.text = screen.text + `\n\n⏰ ` + res.text
+                    eventKeyboard = res.keyboard
+                    
+                    // console.log(0)
+                    // console.log(eventKeyboard)
 
                     if(eventKeyboard.length === 1 && eventKeyboard[0][0].to !== 'zero'){
-                        eventKeyboard = await event.getKeyboardEventMounth(eventKeyboard[0][0].text)
+                        const res = await event.getKeyboardEventMounth(eventKeyboard[0][0].text)
+                        screen.text = screen.text + `\n\n⏰ ` + res.text
+                        eventKeyboard = res.keyboard
 
                         console.log(1)
                         console.log(eventKeyboard)
 
                         if(eventKeyboard.length === 2 && eventKeyboard[1][0].to !== 'zero'){
                             const link = eventKeyboard[1][0].to.split('|')
-                            eventKeyboard = await event.getKeyboardEventDays(link[2], link[3])
+                            const res = await event.getKeyboardEventDays(link[2], link[3])
+                            screen.text = screen.text + `\n\n⏰ ` + res.text
+                            eventKeyboard = res.keyboard
 
                             console.log(2)
                             console.log(eventKeyboard)
 
                             if(eventKeyboard.length === 2 && eventKeyboard[1][0].to !== 'zero'){
                                 const link = eventKeyboard[1][0].to.split('|')
-                                eventKeyboard = await event.getKeyboardEventSlots(link[2], link[3], link[4])
+                                const res =  await event.getKeyboardEventSlots(link[2], link[3], link[4])
+                                screen.text = screen.text + `\n\n⏰ ` + res.text
+                                eventKeyboard = res.keyboard
 
                                 console.log(3)
                                 console.log(eventKeyboard)
@@ -95,7 +139,9 @@ export class BotClass {
                 
             }
             else{
-                eventKeyboard = await event.getKeyboardEventYears()
+                const res =  await event.getKeyboardEventYears()
+                screen.text = screen.text + `\n\n⏰ ` + res.text
+                eventKeyboard = res.keyboard
             }
         }
         

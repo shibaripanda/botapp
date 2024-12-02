@@ -13,7 +13,6 @@ export class EventClass {
         this._id = event._id
     }
 
-
     async getKeyboardEventYears(){
 
         const years = [...new Set(await this.days.map(item => (new Date(item.day)).getFullYear()))]
@@ -27,7 +26,7 @@ export class EventClass {
                 keyboardsYears.push([{text: i + '🔒', to: `zero`, action: 'callback'}])
             }
         }
-        return keyboardsYears
+        return {keyboard: keyboardsYears, text: ''}
     }
     async getKeyboardEventMounth(year){
 
@@ -36,13 +35,13 @@ export class EventClass {
         for(const i of mounths){
             const days = await this.days.filter(item => (new Date(item.day)).getFullYear() === Number(year) && (new Date(item.day)).getMonth() === i).map(item => item.slots).flat().filter(item => item.openForRegistration)
             if(days.length){
-                keyboardsMounths.push([{text: Number(i + 1) + ` (${year})`, to: `${this.sceenId}|to_days|${year}|${i}`, action: 'callback'}])
+                keyboardsMounths.push([{text: Number(i + 1), to: `${this.sceenId}|to_days|${year}|${i}`, action: 'callback'}])
             }
             else{
-                keyboardsMounths.push([{text: Number(i + 1) + ` (${year}) ` + '🔒', to: `zero`, action: 'callback'}])
+                keyboardsMounths.push([{text: Number(i + 1) + '🔒', to: `zero`, action: 'callback'}])
             }
         }
-        return [[{text: 'back', to: this.sceenId, action: 'callback'}]].concat(keyboardsMounths)
+        return {keyboard: [[{text: '🔙', to: this.sceenId, action: 'callback'}]].concat(keyboardsMounths), text: year}
     }
     async getKeyboardEventDays(year, mounth){
 
@@ -51,13 +50,13 @@ export class EventClass {
         for(const i of dayList){
             const days = await i.slots.filter(item => item.openForRegistration)
             if(days.length){
-                keyboardDays.push([{text: new Date(i.day).getDate() + ` (${Number(mounth) + 1}. ${year})`, to: `${this.sceenId}|to_slots|${year}|${mounth}|${new Date(i.day).getDate()}`, action: 'callback'}])
+                keyboardDays.push([{text: new Date(i.day).getDate(), to: `${this.sceenId}|to_slots|${year}|${mounth}|${new Date(i.day).getDate()}`, action: 'callback'}])
             }
             else{
-                keyboardDays.push([{text: new Date(i.day).getDate() + ` (${Number(mounth) + 1}. ${year}) ` + '🔒', to: `zero`, action: 'callback'}])
+                keyboardDays.push([{text: new Date(i.day).getDate() + '🔒', to: `zero`, action: 'callback'}])
             }
         }
-        return [[{text: 'back', to: this.sceenId, action: 'callback'}]].concat(keyboardDays)
+        return {keyboard: [[{text: '🔙', to: this.sceenId, action: 'callback'}]].concat(keyboardDays), text: (Number(mounth) + 1) + '.' + year}
     }
     async getKeyboardEventSlots(year, mounth, day){
 
@@ -65,13 +64,13 @@ export class EventClass {
         const keyboardSlots = []
         for(const i of slots){
             if(i.openForRegistration){
-                keyboardSlots.push([{text: i.startTime + ` (${day}. ${Number(mounth) + 1}. ${year})`, to: `${this.sceenId}|prereg|${year}|${mounth}|${day}|${i.startTime}`, action: 'callback'}])
+                keyboardSlots.push([{text: i.startTime, to: `${this.sceenId}|prereg|${year}|${mounth}|${day}|${i.startTime}`, action: 'callback'}])
             }
             else{
-                keyboardSlots.push([{text: i.startTime + ` (${day}. ${Number(mounth) + 1}. ${year}) ` + '🔒', to: `zero`, action: 'callback'}])
+                keyboardSlots.push([{text: i.startTime + '🔒', to: `zero`, action: 'callback'}])
             }
         }
-        return [[{text: 'back', to: this.sceenId, action: 'callback'}]].concat(keyboardSlots)
+        return {keyboard: [[{text: '🔙', to: this.sceenId, action: 'callback'}]].concat(keyboardSlots), text: day + '.' + (Number(mounth) + 1) + '.' + year}
     }
 
     async getKeyboardEventPreReg(year, mounth, day, slotTime, userId){
@@ -130,7 +129,9 @@ export class EventClass {
                     {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
                 )
             }
-            return [[{text: '✅ ' + slotTime + ` (${day}. ${Number(mounth) + 1}. ${year})`, to: `${this.sceenId}|reg|${year}|${mounth}|${day}|${slotTime}`, action: 'callback'}], [{text: '❌', to: this.sceenId, action: 'callback'}]]
+            return {keyboard: 
+                [[{text: '✅', to: `${this.sceenId}|reg|${year}|${mounth}|${day}|${slotTime}`, action: 'callback'}], [{text: '❌', to: this.sceenId, action: 'callback'}]], 
+                text: day + '.' + (Number(mounth) + 1) +'.' + year + ' ' + slotTime}
         }
 
     }
@@ -171,7 +172,8 @@ export class EventClass {
                 {_id: this._id},
                 {$set: {[link]: 'reg'}},
                 {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
-            ) 
+            )
+            // bot.telegram.sendMessage(userId, `Ваша регистрация: ${day}.${mounth}.${year} ${slotTime}`) 
         }
         else{
             if(clients.length === maxClients){
@@ -204,9 +206,8 @@ export class EventClass {
                 }
             }
         }
-        return [[{text: 'Done! ✅', to: this.sceenId, action: 'callback'}]]
+        return {keyboard: [[{text: '🔙', to: this.sceenId, action: 'callback'}]], text: day + '.' + (Number(mounth) + 1) + '.' + year + ' ' + slotTime + ' ' + '✅'}
 
     }
     
-
 }

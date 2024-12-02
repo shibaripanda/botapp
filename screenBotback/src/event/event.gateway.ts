@@ -6,8 +6,7 @@ import {
 } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
-// import { BotService } from 'src/bot/bot.service'
-// import { EventService } from './event.service'
+import { EventService } from './event.service'
 
 @WebSocketGateway(
   {
@@ -20,27 +19,16 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 export class EventGateway {
 
   constructor(
-    // private eventSevice: EventService,
-    // private botSevice: BotService
+    private eventSevice: EventService
   ) {}
 
-  
-  @WebSocketServer() server: Server;
-
-  // @SubscribeMessage('updateScreenInfo')
-  // async testServerBot(client: Socket, payload: any): Promise<void> {
-  //   if(payload.token === process.env.SERVER_TOKEN && global['connectUsers'][payload.botId]){
-      // const res = await this.screenSevice.getScreens(payload.botId)
-      // this.server.to(global['connectUsers'][payload.botId]).emit('getScreens', res)
-  //   }
-  // }
+  @WebSocketServer() server: Server
 
   @UseGuards(JwtAuthGuard)
-  @SubscribeMessage('test')
-  async deleteScreen(client: Socket, payload: any): Promise<void> {
-    console.log(client)
-    console.log(payload)
-    // await this.screenSevice.deleteScreen(payload)
+  @SubscribeMessage('getEvent')
+  async getEvent(client: Socket, payload: any): Promise<void> {
+    const res = await this.eventSevice.getEvent(payload)
+    this.server.to(client.id).emit(`getEvent|${res['idEvent']}`, res)
   }
 
 }

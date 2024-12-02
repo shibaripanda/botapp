@@ -2,6 +2,7 @@ import { Paper, Text, Group, Grid } from '@mantine/core';
 import React from 'react'
 import { ButtonApp } from '../comps/ButtonApp.tsx';
 import { ModalCreateEvent } from './ModalCreateEvent.tsx';
+import { ModalMonitorEvent } from './ModalMonitorEvent.tsx';
 
 export function EventItem({text, leng, oneEvent, deleteEvent, updateEvent, setEvents}){
 
@@ -11,8 +12,7 @@ export function EventItem({text, leng, oneEvent, deleteEvent, updateEvent, setEv
   ]
 
   const buttonsSectionUse = [
-    // <ModalCreateEventPermament text={text} leng={leng} oneEvent={oneEvent} updateEvent={updateEvent} />,
-    <ButtonApp title={text.open[leng]} handler={() => {}} disabled={false} color={'green'}/>
+    <ModalMonitorEvent text={text} leng={leng} oneEvent={oneEvent}/>,
   ]
 
   const butSection = () => {

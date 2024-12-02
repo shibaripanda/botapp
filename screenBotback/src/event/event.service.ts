@@ -20,4 +20,10 @@ export class EventService {
                 days: data.days
             })
         }
+
+        async getEvent(eventId: string){
+            return await this.eventMongo.findOne({
+                idEvent: eventId
+            })
+        }
 }
