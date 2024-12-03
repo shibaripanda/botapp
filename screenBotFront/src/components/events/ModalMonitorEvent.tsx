@@ -4,6 +4,7 @@ import { Modal } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 import { pipGetSocket } from '../../socket/pipGetSocket.ts'
 import { pipSendSocket } from '../../socket/pipSendSocket.ts'
+import { DayTable } from './DayTable.tsx'
 
 interface EventUse {
   idEvent: string
@@ -26,23 +27,16 @@ export function ModalMonitorEvent({text, leng, oneEvent}) {
   }, [oneEvent.idEvent])
 
 
-
-  const dayList = (days) => {
-    for(const i of days){
-      return new Date(i.day).getDate()
-    }
-  }
-
   if(event){
       return (
         <>
           <Modal size={'65vmax'} opened={opened} 
             onClose={close}
             fullScreen
-            title={'dfdfdfd'}
+            title={event.name}
           >
             <>
-            {dayList(event.days)}
+            {event.days.map((item, index) => <DayTable key={index} day={item}/>)}
 
             </>
           </Modal>

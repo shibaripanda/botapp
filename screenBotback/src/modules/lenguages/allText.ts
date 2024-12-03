@@ -105,6 +105,7 @@ export const textArray: LengData[] = [
     {rutext: 'Редактируется', index: 'editing', info_data: 'редактируется'},
     {rutext: 'Опубликовано', index: 'published', info_data: 'опубликовано'},
     {rutext: 'Используется', index: 'inuse', info_data: 'используется'},
+    // {rutext: 'Максимум клиентов', index: 'maxClients', info_data: 'максимум клиентов'},
     
 ]
 

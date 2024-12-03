@@ -339,7 +339,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent, setEvents})
         <Grid.Col key={index} span={12}>
           <Paper withBorder p="lg" radius="md" shadow="md">
             <Grid align="flex-end">
-              <Grid.Col span={3}>
+              <Grid.Col span={2.4}>
               <TimeInput
                 disabled={index !== editedSlots.length - 1 || editedSlots.length !== 1}
                 value={item.startTime}
@@ -352,7 +352,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent, setEvents})
                 label={text.startSlot[leng]}
               />
               </Grid.Col>
-              <Grid.Col span={3}>
+              <Grid.Col span={2.4}>
                 <TextInput
                   disabled={index !== editedSlots.length - 1}
                   onChange={(event) => {
@@ -365,7 +365,7 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent, setEvents})
                   label={text.durmin[leng]}
                 />
               </Grid.Col>
-              <Grid.Col span={3}>
+              <Grid.Col span={2.4}>
                 <TextInput
                   disabled={index !== editedSlots.length - 1}
                   onChange={(event) => {
@@ -391,7 +391,20 @@ export function ModalCreateEvent({text, leng, oneEvent, updateEvent, setEvents})
                   size={2}
                 />
               </Grid.Col>
-              <Grid.Col span={3}>
+              <Grid.Col span={2.4}>
+                <TextInput
+                  disabled={index !== editedSlots.length - 1}
+                  onChange={(event) => {
+                    item.maxClients = Number(event.currentTarget.value)
+                    setStat(Date.now())
+                  }}
+                  value={item.maxClients}
+                  size="xs"
+                  radius="sm"
+                  label={text.pausmin[leng]}
+                />
+              </Grid.Col>
+              <Grid.Col span={2.4}>
                 <ButtonApp
                   title={text.delete[leng]}
                   disabled={index !== editedSlots.length - 1 || editedSlots.length === 1}
