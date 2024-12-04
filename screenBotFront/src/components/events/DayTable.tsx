@@ -1,15 +1,32 @@
 import React from 'react'
-import { Table } from '@mantine/core'
+import { Anchor, Table, Tooltip } from '@mantine/core'
 
 
 export function DayTable({day}) {
 
-    console.log(day)
+  const userInfo = (user) => {
+    if(user.userInfo){
+      console.log(user.userInfo)
+      if(user.userInfo.username){
+        const link = `https://t.me/${user.userInfo.username}`
+        if(user.userInfo.first_name){
+          const text = user.userInfo.first_name + ' (@' + user.userInfo.username + ')'
+          return <Tooltip label="Direct message" withArrow><Anchor size='sm' href={link} target="_blank">{text}</Anchor></Tooltip>
+        }
+        else{
+          return <Tooltip label="Direct message" withArrow><Anchor size='sm' href={link} target="_blank">@{user.userInfo.username}</Anchor></Tooltip>
+        }
+      }
+    }
+    else{
+      return <Tooltip label="Bot message" withArrow><Anchor size='sm' onClick={() => console.log(user.user)}>{'user' + user.user}</Anchor></Tooltip>
+    }
+  }
 
-  const rows = day.slots.map((row) => {
+  const rows = day.slots.map((row, index) => {
 
     return (
-      <Table.Tr key={row.title}>
+      <Table.Tr key={index}>
         <Table.Td>
             {row.startTime}
         </Table.Td>
@@ -20,7 +37,7 @@ export function DayTable({day}) {
             {row.clients.length}
         </Table.Td> */}
         <Table.Td>
-            {row.clients.map(item => item.user).join(', ')}
+            {row.clients.map(item => userInfo(item))}
         </Table.Td>
       </Table.Tr>
     )

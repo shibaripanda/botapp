@@ -56,6 +56,10 @@ export class BotClass {
             const event = new EventClass(await this.getEvent(screen.event_id), screen._id)
 
             screen.text = screen.text + ' \n' + await this.findUserReg(event.days, userId)
+            console.log(userId)
+            console.log(await this.bot.telegram.getUpdates())
+            console.log(await this.bot.telegram.getUserProfilePhotos(userId))
+            console.log((await this.bot.telegram.getChatMember(userId, userId)).user)
 
             if(toData){
                 if(toData[1] === 'to_mounth'){
@@ -84,7 +88,8 @@ export class BotClass {
                 }
                 else if(toData[1] === 'reg'){
                     console.log('reg')
-                    const res = await event.regEvent(toData[2], toData[3], toData[4], toData[5], userId)
+                    const userInfo = (await this.bot.telegram.getChatMember(userId, userId)).user
+                    const res = await event.regEvent(toData[2], toData[3], toData[4], toData[5], userId, userInfo)
                     screen.text = screen.text + `\n\n⏰ ` + res.text
                     eventKeyboard = res.keyboard
                      

@@ -135,7 +135,7 @@ export class EventClass {
         }
 
     }
-    async regEvent(year, mounth, day, slotTime, userId){
+    async regEvent(year, mounth, day, slotTime, userId, userInfo){
 
         const slots = (await this.event.days.filter(item => (new Date(item.day)).getFullYear() === Number(year) && (new Date(item.day)).getMonth() === Number(mounth) && (new Date(item.day)).getDate() === Number(day)))[0]
 
@@ -168,9 +168,10 @@ export class EventClass {
         if(clients.find(item => item.user === userId && item.status === 'prereg')){
             const index = clients.findIndex(item => item.user === userId && item.status === 'prereg')
             const link = `days.$[el].slots.${a}.clients.${index}.status`
+            const link2 = `days.$[el].slots.${a}.clients.${index}.userInfo`
             this.event = await MyEvent.findByIdAndUpdate(
                 {_id: this._id},
-                {$set: {[link]: 'reg'}},
+                {$set: {[link]: 'reg'}, [link2]: userInfo},
                 {arrayFilters: [{ 'el.day': b }], new: true}, {returnDocument: 'after'}
             )
             // bot.telegram.sendMessage(userId, `Ваша регистрация: ${day}.${mounth}.${year} ${slotTime}`) 

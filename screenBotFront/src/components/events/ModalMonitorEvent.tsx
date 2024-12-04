@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
-import { Modal } from '@mantine/core'
+import { Grid, Modal } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 import { pipGetSocket } from '../../socket/pipGetSocket.ts'
 import { pipSendSocket } from '../../socket/pipSendSocket.ts'
@@ -26,14 +26,20 @@ export function ModalMonitorEvent({text, leng, oneEvent}) {
     pipSendSocket(`getEvent`, oneEvent.idEvent)
   }, [oneEvent.idEvent])
 
+  const countRegUsers = (days) => {
+    const allTickets = days.reduce((acc, item) => acc + item.slots.reduce((acc1, item1) => acc1 + item1.maxClients, 0), 0)
+    const regUsers = days.reduce((acc, item) => acc + item.slots.reduce((acc1, item1) => acc1 + item1.clients.length, 0), 0)
+    return ' ( ' + regUsers + ' / ' + allTickets + ' )'
+  }
+
 
   if(event){
       return (
         <>
-          <Modal size={'65vmax'} opened={opened} 
+          <Modal opened={opened} 
             onClose={close}
             fullScreen
-            title={event.name}
+            title={event.name + ' ' + countRegUsers(event.days)}
           >
             <>
             {event.days.map((item, index) => <DayTable key={index} day={item}/>)}
