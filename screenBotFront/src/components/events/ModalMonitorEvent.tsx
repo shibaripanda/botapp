@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
-import { Grid, Modal } from '@mantine/core'
+import { Modal } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 import { pipGetSocket } from '../../socket/pipGetSocket.ts'
 import { pipSendSocket } from '../../socket/pipSendSocket.ts'
@@ -32,6 +32,11 @@ export function ModalMonitorEvent({text, leng, oneEvent}) {
     return ' ( ' + regUsers + ' / ' + allTickets + ' )'
   }
 
+  const deleteUserRegistration = async (indexDay, indexSlot, client) => {
+    console.log(indexDay, indexSlot, client)
+    pipSendSocket('deleteUserRegistration', {idEvent: oneEvent.idEvent, indexDay: indexDay, indexSlot: indexSlot, client: client})
+  }
+
 
   if(event){
       return (
@@ -42,7 +47,7 @@ export function ModalMonitorEvent({text, leng, oneEvent}) {
             title={event.name + ' ' + countRegUsers(event.days)}
           >
             <>
-            {event.days.map((item, index) => <DayTable key={index} day={item}/>)}
+            {event.days.map((item, index) => <DayTable key={index} day={item} deleteUserRegistration={deleteUserRegistration} indexDay={index}/>)}
 
             </>
           </Modal>

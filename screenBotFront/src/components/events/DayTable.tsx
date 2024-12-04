@@ -1,43 +1,22 @@
 import React from 'react'
-import { Anchor, Table, Tooltip } from '@mantine/core'
+import { Grid, Table } from '@mantine/core'
+import { UserAction } from './UserAction.tsx'
 
 
-export function DayTable({day}) {
+export function DayTable({day, deleteUserRegistration, indexDay}) {
 
-  const userInfo = (user) => {
-    if(user.userInfo){
-      console.log(user.userInfo)
-      if(user.userInfo.username){
-        const link = `https://t.me/${user.userInfo.username}`
-        if(user.userInfo.first_name){
-          const text = user.userInfo.first_name + ' (@' + user.userInfo.username + ')'
-          return <Tooltip label="Direct message" withArrow><Anchor size='sm' href={link} target="_blank">{text}</Anchor></Tooltip>
-        }
-        else{
-          return <Tooltip label="Direct message" withArrow><Anchor size='sm' href={link} target="_blank">@{user.userInfo.username}</Anchor></Tooltip>
-        }
-      }
-    }
-    else{
-      return <Tooltip label="Bot message" withArrow><Anchor size='sm' onClick={() => console.log(user.user)}>{'user' + user.user}</Anchor></Tooltip>
-    }
-  }
-
-  const rows = day.slots.map((row, index) => {
+  const rows = day.slots.map((slot, index1) => {
 
     return (
-      <Table.Tr key={index}>
-        <Table.Td>
-            {row.startTime}
+      <Table.Tr key={index1}>
+        <Table.Td  width={'10%'}>
+            {slot.startTime}
+        </Table.Td>
+        <Table.Td  width={'10%'}>
+            {slot.clients.length} / {slot.maxClients}  
         </Table.Td>
         <Table.Td>
-            {row.clients.length} / {row.maxClients}  
-        </Table.Td>
-        {/* <Table.Td>
-            {row.clients.length}
-        </Table.Td> */}
-        <Table.Td>
-            {row.clients.map(item => userInfo(item))}
+            <Grid>{slot.clients.map((item, index) => <Grid.Col span={2.5}><UserAction key={index} user={item} indexDay={indexDay} indexSlot={index1} deleteUserRegistration={deleteUserRegistration}/></Grid.Col>)}</Grid>
         </Table.Td>
       </Table.Tr>
     )
@@ -48,9 +27,8 @@ export function DayTable({day}) {
       <Table verticalSpacing="xs"  withTableBorder withRowBorders={false} striped withColumnBorders>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th width={'10%'}>{new Date(day.day).getDate() + '.' + (new Date(day.day).getMonth() + 1) + '.' + new Date(day.day).getFullYear()}</Table.Th>
-            <Table.Th width={'10%'}>Clients: {day.slots.reduce((acc, item) => acc + item.clients.length, 0)} / {day.slots.reduce((acc, item) => acc + item.maxClients, 0)}</Table.Th>
-            {/* <Table.Th width={'10%'}>Clients: {day.slots.reduce((acc, item) => acc + item.clients.length, 0)}</Table.Th> */}
+            <Table.Th>{new Date(day.day).getDate() + '.' + (new Date(day.day).getMonth() + 1) + '.' + new Date(day.day).getFullYear()}</Table.Th>
+            <Table.Th>Clients: {day.slots.reduce((acc, item) => acc + item.clients.length, 0)} / {day.slots.reduce((acc, item) => acc + item.maxClients, 0)}</Table.Th>
             <Table.Th>Clients</Table.Th>
           </Table.Tr>
         </Table.Thead>

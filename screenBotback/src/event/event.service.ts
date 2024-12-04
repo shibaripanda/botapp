@@ -26,4 +26,13 @@ export class EventService {
                 idEvent: eventId
             })
         }
+
+        async deleteUserRegistration(data: any){
+            const link = `days.${data.indexDay}.slots.${data.indexSlot}.clients`
+            console.log(await this.eventMongo.findOneAndUpdate({idEvent: data.idEvent}))
+            return await this.eventMongo.findOneAndUpdate(
+                {idEvent: data.idEvent},
+                {$pull: {[link]: data.client}},
+                {returnDocument: 'after'})
+        }
 }

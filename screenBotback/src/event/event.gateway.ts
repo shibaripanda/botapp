@@ -31,4 +31,13 @@ export class EventGateway {
     this.server.to(client.id).emit(`getEvent|${res['idEvent']}`, res)
   }
 
+  @UseGuards(JwtAuthGuard)
+  @SubscribeMessage('deleteUserRegistration')
+  async deleteUserRegistration(client: Socket, payload: any): Promise<void> {
+    console.log(payload)
+    const res = await this.eventSevice.deleteUserRegistration(payload)
+    console.log(res)
+    // this.server.to(client.id).emit(`getEvent|${res['idEvent']}`, res)
+  }
+
 }
