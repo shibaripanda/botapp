@@ -33,7 +33,6 @@ export function ModalMonitorEvent({text, leng, oneEvent}) {
   }
 
   const deleteUserRegistration = async (indexDay, indexSlot, client) => {
-    console.log(indexDay, indexSlot, client)
     pipSendSocket('deleteUserRegistration', {idEvent: oneEvent.idEvent, indexDay: indexDay, indexSlot: indexSlot, client: client})
   }
 

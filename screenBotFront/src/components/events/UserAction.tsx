@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 
 export function UserAction({user, indexDay, indexSlot, deleteUserRegistration}) {
 
-    console.log(user)
     const [opened, setOpened] = useState(false)
 
     const userInfo = (user) => {
@@ -50,7 +49,6 @@ export function UserAction({user, indexDay, indexSlot, deleteUserRegistration}) 
         return (
             <Menu.Item key={3}>
                 <Anchor size='sm' onClick={() => {
-                    console.log('delete')
                     deleteUserRegistration(indexDay, indexSlot, user)
                 }}>
                     <Text c={'red'}>Cancel registration</Text>

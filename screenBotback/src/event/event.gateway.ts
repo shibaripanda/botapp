@@ -24,6 +24,14 @@ export class EventGateway {
 
   @WebSocketServer() server: Server
 
+  @SubscribeMessage('updateEventInfo')
+  async testServerBot(client: Socket, payload: any): Promise<void> {
+    if(payload.token === process.env.SERVER_TOKEN && global['connectUsers'][payload.botId]){
+      const res = await this.eventSevice.getEvent(payload.idEvent)
+      this.server.to(global['connectUsers'][payload.botId]).emit(`getEvent|${res['idEvent']}`, res)
+    }
+  }
+
   @UseGuards(JwtAuthGuard)
   @SubscribeMessage('getEvent')
   async getEvent(client: Socket, payload: any): Promise<void> {
@@ -34,10 +42,8 @@ export class EventGateway {
   @UseGuards(JwtAuthGuard)
   @SubscribeMessage('deleteUserRegistration')
   async deleteUserRegistration(client: Socket, payload: any): Promise<void> {
-    console.log(payload)
     const res = await this.eventSevice.deleteUserRegistration(payload)
-    console.log(res)
-    // this.server.to(client.id).emit(`getEvent|${res['idEvent']}`, res)
+    this.server.to(client.id).emit(`getEvent|${res['idEvent']}`, res)
   }
 
 }

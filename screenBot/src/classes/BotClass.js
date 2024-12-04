@@ -50,16 +50,18 @@ export class BotClass {
     }
 
     async message(screen, userId, userData, toData){
+        // console.log(screen)
         let eventKeyboard = []
 
         if(screen.mode === 'event'){
             const event = new EventClass(await this.getEvent(screen.event_id), screen._id)
+            console.log(event.idEvent)
 
             screen.text = screen.text + ' \n' + await this.findUserReg(event.days, userId)
-            console.log(userId)
-            console.log(await this.bot.telegram.getUpdates())
-            console.log(await this.bot.telegram.getUserProfilePhotos(userId))
-            console.log((await this.bot.telegram.getChatMember(userId, userId)).user)
+            // console.log(userId)
+            // console.log(await this.bot.telegram.getUpdates())
+            // console.log(await this.bot.telegram.getUserProfilePhotos(userId))
+            // console.log((await this.bot.telegram.getChatMember(userId, userId)).user)
 
             if(toData){
                 if(toData[1] === 'to_mounth'){
@@ -92,6 +94,8 @@ export class BotClass {
                     const res = await event.regEvent(toData[2], toData[3], toData[4], toData[5], userId, userInfo)
                     screen.text = screen.text + `\n\n⏰ ` + res.text
                     eventKeyboard = res.keyboard
+                    
+                    SocketApt.socket.emit('updateEventInfo', {botId: this._id, token: process.env.SERVER_TOKEN, idEvent: event.idEvent})
                      
                 }
                 // else if(toData[1] === 'donereg'){

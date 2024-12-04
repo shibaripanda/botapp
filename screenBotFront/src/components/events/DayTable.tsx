@@ -16,7 +16,7 @@ export function DayTable({day, deleteUserRegistration, indexDay}) {
             {slot.clients.length} / {slot.maxClients}  
         </Table.Td>
         <Table.Td>
-            <Grid>{slot.clients.map((item, index) => <Grid.Col span={2.5}><UserAction key={index} user={item} indexDay={indexDay} indexSlot={index1} deleteUserRegistration={deleteUserRegistration}/></Grid.Col>)}</Grid>
+            <Grid>{slot.clients.map((item, index) => <Grid.Col key={index} span={2.5}><UserAction key={index} user={item} indexDay={indexDay} indexSlot={index1} deleteUserRegistration={deleteUserRegistration}/></Grid.Col>)}</Grid>
         </Table.Td>
       </Table.Tr>
     )
