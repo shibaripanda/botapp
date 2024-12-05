@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
-import { Modal } from '@mantine/core'
+import { Group, Modal, Switch } from '@mantine/core'
 import { ButtonApp } from '../comps/ButtonApp.tsx'
 import { pipGetSocket } from '../../socket/pipGetSocket.ts'
 import { pipSendSocket } from '../../socket/pipSendSocket.ts'
@@ -10,13 +10,23 @@ interface EventUse {
   idEvent: string
   name: string
   dateStartAndStop: []
-  days: []
+  days: Day[]
+}
+
+interface Day {
+  day: any
+  slots: Slots[]
+}
+
+interface Slots {
+  clients: []
 }
 
 export function ModalMonitorEvent({text, leng, oneEvent, botId}) {
 
   const [opened, { open, close }] = useDisclosure(false)
   const [event, setEvent] = useState<EventUse | false>(false)
+  const [checked, setChecked] = useState(false)
 
   useEffect(() => {
     const pipSocketListners = [
@@ -26,27 +36,58 @@ export function ModalMonitorEvent({text, leng, oneEvent, botId}) {
     pipSendSocket(`getEvent`, {botId: botId, idEvent: oneEvent.idEvent})
   }, [oneEvent.idEvent, botId])
 
+  const slotsFilter = useMemo(() => {
+    if(event){
+      if(!checked){
+        return event.days
+      }
+      return event.days.filter(item => item.slots.reduce((acc, item) => acc + item.clients.length, 0) > 0)
+    }
+    
+    }, [event, checked]
+  )
+
   const countRegUsers = (days) => {
     const allTickets = days.reduce((acc, item) => acc + item.slots.reduce((acc1, item1) => acc1 + item1.maxClients, 0), 0)
     const regUsers = days.reduce((acc, item) => acc + item.slots.reduce((acc1, item1) => acc1 + item1.clients.length, 0), 0)
-    return ' ( ' + regUsers + ' / ' + allTickets + ' )'
+    const res = ' ( ' + regUsers + ' / ' + allTickets + ' )'
+    return res
   }
 
   const deleteUserRegistration = async (indexDay, indexSlot, client) => {
     pipSendSocket('deleteUserRegistration', {idEvent: oneEvent.idEvent, indexDay: indexDay, indexSlot: indexSlot, client: client})
   }
 
+  const topLine = () => {
+    if(event){
+      return (
+        <Group gap="xl">
+          <div>{event.name}</div>
+          <div>{countRegUsers(event.days)}</div>
+          <Switch
+            label={'не пустые'}
+            radius="lg"
+            color='green'
+            checked={checked}
+            onChange={(event) => {
+              setChecked(event.currentTarget.checked)
+            }}/>
+        </Group>
+      )
+    }
+  }
 
-  if(event){
+
+  if(event && slotsFilter){
       return (
         <>
           <Modal opened={opened} 
             onClose={close}
             fullScreen
-            title={event.name + ' ' + countRegUsers(event.days)}
+            title={topLine()}
           >
             <>
-            {event.days.map((item, index) => <DayTable key={index} day={item} deleteUserRegistration={deleteUserRegistration} indexDay={index}/>)}
+            {slotsFilter.map((item, index) => <DayTable key={index} day={item} deleteUserRegistration={deleteUserRegistration} indexDay={index}/>)}
 
             </>
           </Modal>

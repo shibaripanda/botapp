@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Table } from '@mantine/core'
+import { Button, Grid, Table } from '@mantine/core'
 import { UserAction } from './UserAction.tsx'
 
 
@@ -29,7 +29,8 @@ export function DayTable({day, deleteUserRegistration, indexDay}) {
           <Table.Tr>
             <Table.Th>{new Date(day.day).getDate() + '.' + (new Date(day.day).getMonth() + 1) + '.' + new Date(day.day).getFullYear()}</Table.Th>
             <Table.Th>Clients: {day.slots.reduce((acc, item) => acc + item.clients.length, 0)} / {day.slots.reduce((acc, item) => acc + item.maxClients, 0)}</Table.Th>
-            <Table.Th>Clients</Table.Th>
+            <Table.Th>Clients <Button variant={'default'} 
+            size="xs">Создать группу</Button></Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>

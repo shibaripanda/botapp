@@ -6,7 +6,8 @@ export const botStart = async (botModule) => {
             if(ctx.message.chat.id > 0 && !ctx.from.is_bot){
                const user = await getUser(ctx.message.from, botModule._id)
                const screen = await botModule.getZeroScreen()
-               await botModule.message(screen, ctx.message.chat.id)
+               const time = await botModule.message(screen, ctx.message.chat.id)
+               await user.updateTimePoint(time)
                await user.updateScreen(screen._id.toString())
                await user.updateToClient()
             }

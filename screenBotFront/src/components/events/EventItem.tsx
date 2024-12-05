@@ -16,7 +16,7 @@ export function EventItem({text, leng, oneEvent, deleteEvent, updateEvent, setEv
   ]
 
   const butSection = () => {
-    if(['public', 'use'].includes(oneEvent.status)){
+    if(['use'].includes(oneEvent.status)){
       return buttonsSectionUse.map((item, index) => <Grid.Col key={index} span={12 / buttonsSectionUse.length}>{item}</Grid.Col>)
     }
     return buttonsSection.map((item, index) => <Grid.Col key={index} span={12 / buttonsSection.length}>{item}</Grid.Col>)

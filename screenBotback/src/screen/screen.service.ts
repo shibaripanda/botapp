@@ -95,7 +95,8 @@ export class ScreenService {
                 protect: true,
                 variable: '',
                 mode: 'event',
-                event_id: newEvent._id
+                event_id: newEvent._id,
+                idEvent: event.idEvent
             })
             }
         }

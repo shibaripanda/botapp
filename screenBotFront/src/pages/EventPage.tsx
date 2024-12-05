@@ -169,7 +169,7 @@ export function EventPage(){
         </Grid>
 
         <Grid>
-          {eventFilter.map((item, index) => <Grid.Col key={index} span={4}>
+          {eventFilter.map((item, index) => <Grid.Col key={item.idEvent} span={4}>
             <EventItem
               setEvents={setEvents}
               text={text}

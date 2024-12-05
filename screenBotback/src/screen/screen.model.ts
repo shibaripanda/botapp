@@ -44,6 +44,11 @@ export const ScreenSchema = new mongoose.Schema({
     type: String,
     required: true,
     default: 'zero'
+  },
+  idEvent: {
+    type: String,
+    required: true,
+    default: 'zero'
   }
 }, {timestamps: true})
 

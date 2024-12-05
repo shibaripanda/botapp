@@ -1,13 +1,14 @@
 import { Menu, Button } from '@mantine/core';
 import React, { useState } from 'react'
 
-export function SpesialListMenu({updateEvent, setNewScreenName, newScreenName, createEventScreen, events, text, leng, spScreen, setSpScreen, activButtonCreateScreen}) {
+export function SpesialListMenu({screens, updateEvent, setNewScreenName, newScreenName, createEventScreen, events, text, leng, spScreen, setSpScreen, activButtonCreateScreen}) {
 
 
     console.log(events)
     const [opened, setOpened] = useState(false)
-
-    const menuItems = events.filter(item => item.status === 'public').map((item, index) => 
+    // console.log(screens[0])
+    // console.log(screens.map(item => item.idEvent))
+    const menuItems = events.filter(item => item.status === 'public' || 'use').filter(item => !screens.map(item => item.idEvent).includes(item.idEvent)).map((item, index) => 
         
             <Menu.Item
                 key={index}

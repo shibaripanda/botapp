@@ -15,10 +15,16 @@ export class UserClass {
         this.activBot = user.activBot[botId]
         this.data = user.data[botId]
         this.screen = user.screen[botId]
+        this.updateTime = user.updateTime
     }
 
     async updateToClient(){
         SocketApt.socket.emit('updateUserToClient', {botId: this.botId, token: process.env.SERVER_TOKEN})
+    }
+
+    async updateTimePoint(time){
+        this.updateTime = time
+        await this.user.updateOne({updateTime: time})
     }
 
     async updateScreen(screenId){

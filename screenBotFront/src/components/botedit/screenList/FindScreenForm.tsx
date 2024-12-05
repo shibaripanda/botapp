@@ -55,7 +55,7 @@ export function FindScreenForm({updateEvent, createEventScreen, events, text, le
                     </Button>
                 </Grid.Col>
                 <Grid.Col span={6} key={2}>
-                    <SpesialListMenu updateEvent={updateEvent} setNewScreenName={setNewScreenName} newScreenName={newScreenName} createEventScreen={createEventScreen} events={events} text={text} leng={leng} spScreen={spScreen} setSpScreen={setSpScreen} activButtonCreateScreen={activButtonCreateScreen}/>
+                    <SpesialListMenu screens={screens} updateEvent={updateEvent} setNewScreenName={setNewScreenName} newScreenName={newScreenName} createEventScreen={createEventScreen} events={events} text={text} leng={leng} spScreen={spScreen} setSpScreen={setSpScreen} activButtonCreateScreen={activButtonCreateScreen}/>
                 </Grid.Col>
             </Grid>
 

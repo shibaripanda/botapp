@@ -50,8 +50,8 @@ export class BotClass {
     }
 
     async message(screen, userId, userData, toData){
-        // console.log(screen)
         let eventKeyboard = []
+        let mes 
 
         if(screen.mode === 'event'){
             const event = new EventClass(await this.getEvent(screen.event_id), screen._id)
@@ -136,9 +136,6 @@ export class BotClass {
                 eventKeyboard = res.keyboard
             }
         }
-        
-
-    
         if(userData){
             for(const key in userData){
                 screen.text = screen.text.replaceAll(`<$>${key}<$>`, userData[key])
@@ -147,7 +144,6 @@ export class BotClass {
                 screen.text = screen.text.replaceAll(`<$>${key}<$>`, '')
             }
         }
-
         const keyboard = () => {
             if(screen.buttons.length || eventKeyboard.length){
                const res = []
@@ -157,110 +153,110 @@ export class BotClass {
                 return Markup.inlineKeyboard(res) 
             }
         }
-
         const emptyText = () => {
             if(screen.text == '') return '------------------------------'
             return screen.text
         }
 
         if(!screen.media.length && !screen.document.length && !screen.audio.length && screen.text == ''){
-            await this.bot.telegram.sendMessage(userId, `Empty screen.\nAdd content: videos, photos, voice, audio, files or text`, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+            mes = await this.bot.telegram.sendMessage(userId, `Empty screen.\nAdd content: videos, photos, voice, audio, files or text`, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
         }
         else{
             if(screen.text && screen.text.length > 1000){
                 if(screen.document.length){
-                    await this.bot.telegram.sendMediaGroup(userId, screen.document, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                    mes = await this.bot.telegram.sendMediaGroup(userId, screen.document, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
                 }
                 if(screen.audio.length){
                     for(let mes of screen.audio){
-                        await this.bot.telegram.sendAudio(userId, mes.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                        mes = await this.bot.telegram.sendAudio(userId, mes.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
                     }
                 }
                 if(screen.media.length){
-                    await this.bot.telegram.sendMediaGroup(userId, screen.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                    mes = await this.bot.telegram.sendMediaGroup(userId, screen.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
                 }
-                await this.bot.telegram.sendMessage(userId, emptyText(), {...keyboard(), protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                mes = await this.bot.telegram.sendMessage(userId, emptyText(), {...keyboard(), protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
             }
             else{
                 if(screen.media.length && !screen.document.length && !screen.audio.length){
                     if(screen.media.length == 1 && screen.media[0].type == 'photo'){
-                        await this.bot.telegram.sendPhoto(userId, screen.media[0].media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
+                        mes = await this.bot.telegram.sendPhoto(userId, screen.media[0].media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
                     }
                     else if(screen.media.length == 1 && screen.media[0].type == 'video'){
-                        await this.bot.telegram.sendVideo(userId, screen.media[0].media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
+                        mes = await this.bot.telegram.sendVideo(userId, screen.media[0].media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
                     }
                     else{
                     if(!screen.buttons.length){
                             screen.media[0].caption = screen.text
-                            await this.bot.telegram.sendMediaGroup(userId, screen.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
+                            mes = await this.bot.telegram.sendMediaGroup(userId, screen.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
                         }
                         else{
-                            await this.bot.telegram.sendMediaGroup(userId, screen.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
-                            await this.bot.telegram.sendMessage(userId, emptyText(), {...keyboard(), protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error)) 
+                            mes = await this.bot.telegram.sendMediaGroup(userId, screen.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                            mes = await this.bot.telegram.sendMessage(userId, emptyText(), {...keyboard(), protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error)) 
                         } 
                     }
                 }
                 else if(!screen.media.length && screen.document.length && !screen.audio.length){
                     if(screen.document.length == 1){
-                        await this.bot.telegram.sendDocument(userId, screen.document[0].media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error)) 
+                        mes = await this.bot.telegram.sendDocument(userId, screen.document[0].media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error)) 
                     }
                     else{
                         if(!screen.buttons.length){
                             screen.document[screen.document.length - 1].caption = screen.text
-                            await this.bot.telegram.sendMediaGroup(userId, screen.document, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                            mes = await this.bot.telegram.sendMediaGroup(userId, screen.document, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
                         }
                         else{
-                            await this.bot.telegram.sendMediaGroup(userId, screen.document, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
-                            await this.bot.telegram.sendMessage(userId, emptyText(), {...keyboard(), protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                            mes = await this.bot.telegram.sendMediaGroup(userId, screen.document, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                            mes = await this.bot.telegram.sendMessage(userId, emptyText(), {...keyboard(), protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
                         } 
                     } 
                 }
                 else if(!screen.media.length && !screen.document.length && screen.audio.length){
                     for(let mes of screen.audio){
                         if(screen.audio.indexOf(mes) == screen.audio.length - 1){
-                            await this.bot.telegram.sendAudio(userId, mes.media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error)) 
+                            mes = await this.bot.telegram.sendAudio(userId, mes.media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error)) 
                         }
                         else{
-                            await this.bot.telegram.sendAudio(userId, mes.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error)) 
+                            mes = await this.bot.telegram.sendAudio(userId, mes.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error)) 
                         }
                     } 
                 }
                 else{
                     if(screen.document.length){
-                        await this.bot.telegram.sendMediaGroup(userId, screen.document, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                        mes = await this.bot.telegram.sendMediaGroup(userId, screen.document, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
                     }
                     if(screen.audio.length){
                         for(let mes of screen.audio){
-                            await this.bot.telegram.sendAudio(userId, mes.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                            mes = await this.bot.telegram.sendAudio(userId, mes.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
                         }
                     }
                     if(screen.media.length){
                         if(screen.media.length == 1 && screen.media[0].type == 'photo'){
-                            await this.bot.telegram.sendPhoto(userId, screen.media[0].media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
+                            mes = await this.bot.telegram.sendPhoto(userId, screen.media[0].media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
                         }
                         else if(screen.media.length == 1 && screen.media[0].type == 'video'){
-                            await this.bot.telegram.sendVideo(userId, screen.media[0].media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
+                            mes = await this.bot.telegram.sendVideo(userId, screen.media[0].media, {...keyboard(), caption: screen.text, protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
                         }
                         else{
                         if(!screen.buttons.length){
                                 screen.media[0].caption = screen.text
-                                await this.bot.telegram.sendMediaGroup(userId, screen.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
+                                mes = await this.bot.telegram.sendMediaGroup(userId, screen.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))  
                             }
                             else{
-                                await this.bot.telegram.sendMediaGroup(userId, screen.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
-                                await this.bot.telegram.sendMessage(userId, emptyText(), {...keyboard(), protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error)) 
+                                mes = await this.bot.telegram.sendMediaGroup(userId, screen.media, {protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                                mes = await this.bot.telegram.sendMessage(userId, emptyText(), {...keyboard(), protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error)) 
                             } 
                         }
                     }
                     else{
                         if(screen.buttons.length || screen.text){
-                            await this.bot.telegram.sendMessage(userId, emptyText(), {...keyboard(), protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
+                            mes = await this.bot.telegram.sendMessage(userId, emptyText(), {...keyboard(), protect_content: screen.protect, parse_mode: 'HTML'}).catch(error => console.log(error))
                         }
                     }
                 }
             }
            
         }
+        return mes.date
     }
 
     async messageContent(userId, content){

@@ -30,6 +30,11 @@ language: {
 first_name: {
     type: String,
     required: false,
+},
+updateTime: {
+    type: Number,
+    required: true,
+    default: 0
 }
 }, { timestamps: true});
 
