@@ -4,7 +4,7 @@ import { ButtonApp } from '../comps/ButtonApp.tsx';
 import { ModalCreateEvent } from './ModalCreateEvent.tsx';
 import { ModalMonitorEvent } from './ModalMonitorEvent.tsx';
 
-export function EventItem({text, leng, oneEvent, deleteEvent, updateEvent, setEvents}){
+export function EventItem({text, leng, oneEvent, deleteEvent, updateEvent, setEvents, botId}){
 
   const buttonsSection = [
     <ModalCreateEvent text={text} leng={leng} oneEvent={oneEvent} updateEvent={updateEvent} setEvents={setEvents}/>,
@@ -12,7 +12,7 @@ export function EventItem({text, leng, oneEvent, deleteEvent, updateEvent, setEv
   ]
 
   const buttonsSectionUse = [
-    <ModalMonitorEvent text={text} leng={leng} oneEvent={oneEvent}/>,
+    <ModalMonitorEvent text={text} leng={leng} oneEvent={oneEvent} botId={botId}/>,
   ]
 
   const butSection = () => {

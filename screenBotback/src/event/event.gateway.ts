@@ -35,7 +35,8 @@ export class EventGateway {
   @UseGuards(JwtAuthGuard)
   @SubscribeMessage('getEvent')
   async getEvent(client: Socket, payload: any): Promise<void> {
-    const res = await this.eventSevice.getEvent(payload)
+    global['connectUsers'][payload.botId] = client.id
+    const res = await this.eventSevice.getEvent(payload.idEvent)
     this.server.to(client.id).emit(`getEvent|${res['idEvent']}`, res)
   }
 

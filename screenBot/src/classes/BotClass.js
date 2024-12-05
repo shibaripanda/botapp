@@ -94,9 +94,7 @@ export class BotClass {
                     const res = await event.regEvent(toData[2], toData[3], toData[4], toData[5], userId, userInfo)
                     screen.text = screen.text + `\n\n⏰ ` + res.text
                     eventKeyboard = res.keyboard
-                    
                     SocketApt.socket.emit('updateEventInfo', {botId: this._id, token: process.env.SERVER_TOKEN, idEvent: event.idEvent})
-                     
                 }
                 // else if(toData[1] === 'donereg'){
                 //     console.log('donereg')
@@ -111,35 +109,20 @@ export class BotClass {
                     const res = await event.getKeyboardEventYears()
                     screen.text = screen.text + `\n\n⏰ ` + res.text
                     eventKeyboard = res.keyboard
-                    
-                    // console.log(0)
-                    // console.log(eventKeyboard)
-
                     if(eventKeyboard.length === 1 && eventKeyboard[0][0].to !== 'zero'){
                         const res = await event.getKeyboardEventMounth(eventKeyboard[0][0].text)
                         screen.text = screen.text + `\n\n⏰ ` + res.text
                         eventKeyboard = res.keyboard
-
-                        console.log(1)
-                        console.log(eventKeyboard)
-
                         if(eventKeyboard.length === 2 && eventKeyboard[1][0].to !== 'zero'){
                             const link = eventKeyboard[1][0].to.split('|')
                             const res = await event.getKeyboardEventDays(link[2], link[3])
                             screen.text = screen.text + `\n\n⏰ ` + res.text
                             eventKeyboard = res.keyboard
-
-                            console.log(2)
-                            console.log(eventKeyboard)
-
                             if(eventKeyboard.length === 2 && eventKeyboard[1][0].to !== 'zero'){
                                 const link = eventKeyboard[1][0].to.split('|')
                                 const res =  await event.getKeyboardEventSlots(link[2], link[3], link[4])
                                 screen.text = screen.text + `\n\n⏰ ` + res.text
                                 eventKeyboard = res.keyboard
-
-                                console.log(3)
-                                console.log(eventKeyboard)
                             }
                         }
                     } 

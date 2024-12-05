@@ -13,7 +13,7 @@ interface EventUse {
   days: []
 }
 
-export function ModalMonitorEvent({text, leng, oneEvent}) {
+export function ModalMonitorEvent({text, leng, oneEvent, botId}) {
 
   const [opened, { open, close }] = useDisclosure(false)
   const [event, setEvent] = useState<EventUse | false>(false)
@@ -23,8 +23,8 @@ export function ModalMonitorEvent({text, leng, oneEvent}) {
       {pip: `getEvent|${oneEvent.idEvent}`, handler: setEvent}
     ]
     pipGetSocket(pipSocketListners)
-    pipSendSocket(`getEvent`, oneEvent.idEvent)
-  }, [oneEvent.idEvent])
+    pipSendSocket(`getEvent`, {botId: botId, idEvent: oneEvent.idEvent})
+  }, [oneEvent.idEvent, botId])
 
   const countRegUsers = (days) => {
     const allTickets = days.reduce((acc, item) => acc + item.slots.reduce((acc1, item1) => acc1 + item1.maxClients, 0), 0)

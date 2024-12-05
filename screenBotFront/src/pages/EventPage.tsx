@@ -177,6 +177,7 @@ export function EventPage(){
               updateEvent={func.updateEvent}
               oneEvent={item} 
               deleteEvent={func.deleteEvent}
+              botId={botId}
             />
             </Grid.Col>)}
         </Grid>
