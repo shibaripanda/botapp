@@ -51,7 +51,7 @@ export class EventClass {
                 keyboardsMounths.push([{text: Number(i + 1) + '🔒', to: `zero`, action: 'callback'}])
             }
         }
-        return {keyboard: [[{text: '🔙', to: this.sceenId, action: 'callback'}]].concat(keyboardsMounths), text: year}
+        return {keyboard: [[{text: '♻️', to: this.sceenId, action: 'callback'}]].concat(keyboardsMounths), text: year}
     }
     async getKeyboardEventDays(year, mounth){
 
@@ -66,7 +66,7 @@ export class EventClass {
                 keyboardDays.push([{text: new Date(i.day).getDate() + '🔒', to: `zero`, action: 'callback'}])
             }
         }
-        return {keyboard: [[{text: '🔙', to: this.sceenId, action: 'callback'}]].concat(keyboardDays), text: (Number(mounth) + 1) + '.' + year}
+        return {keyboard: [[{text: '♻️', to: this.sceenId, action: 'callback'}]].concat(keyboardDays), text: (Number(mounth) + 1) + '.' + year}
     }
     async getKeyboardEventSlots(year, mounth, day){
 
@@ -80,7 +80,7 @@ export class EventClass {
                 keyboardSlots.push([{text: i.startTime + '🔒', to: `zero`, action: 'callback'}])
             }
         }
-        return {keyboard: [[{text: '🔙', to: this.sceenId, action: 'callback'}]].concat(keyboardSlots), text: day + '.' + (Number(mounth) + 1) + '.' + year}
+        return {keyboard: [[{text: '♻️', to: this.sceenId, action: 'callback'}]].concat(keyboardSlots), text: day + '.' + (Number(mounth) + 1) + '.' + year}
     }
 
     async getKeyboardEventPreReg(year, mounth, day, slotTime, userId){
@@ -175,7 +175,7 @@ export class EventClass {
                 maxClients = this.event.days.find(item => item.day === b).slots[a].maxClients
             }
         }
-        return {keyboard: [[{text: '🔙', to: this.sceenId, action: 'callback'}]], text: day + '.' + (Number(mounth) + 1) + '.' + year + ' ' + slotTime + ' ' + '✅'}
+        return {keyboard: [[{text: '♻️', to: this.sceenId, action: 'callback'}]], text: day + '.' + (Number(mounth) + 1) + '.' + year + ' ' + slotTime + ' ' + '✅'}
 
     }
     
