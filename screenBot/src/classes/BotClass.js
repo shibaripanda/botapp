@@ -29,6 +29,7 @@ export class BotClass {
 
     async findUserReg(days, userId){
         const res = []
+        const ticketPik = '🎟'
         for(const i of days){
             const slots = i.slots.map(item => ({cli: item.clients, startTime: item.startTime}))
             for(const y of slots){
@@ -43,7 +44,7 @@ export class BotClass {
         let evList = ''
         for(const ev of res.sort((a, b) => a.time - b.time)){
             const time = new Date(ev.day)
-            evList = evList + '⏰ ' + time.getDate() + '.' + (time.getMonth() + 1) + '.' + time.getFullYear() + ' ' + ev.start  + ' ✅' + '\n'
+            evList = evList + ticketPik + time.getDate() + '.' + (time.getMonth() + 1) + '.' + time.getFullYear() + ' ' + ev.start  + ' ✅' + '\n'
 
         }
         return evList
@@ -51,77 +52,64 @@ export class BotClass {
 
     async message(screen, userId, userData, toData){
         let eventKeyboard = []
-        let mes 
+        let mes
+        const ticketPik = '🎟' 
 
         if(screen.mode === 'event'){
             const event = new EventClass(await this.getEvent(screen.event_id), screen._id)
-            console.log(event.idEvent)
 
-            screen.text = screen.text + ' \n' + await this.findUserReg(event.days, userId)
-            // console.log(userId)
-            // console.log(await this.bot.telegram.getUpdates())
-            // console.log(await this.bot.telegram.getUserProfilePhotos(userId))
-            // console.log((await this.bot.telegram.getChatMember(userId, userId)).user)
+            screen.text = screen.text + '\n\n🔹 ' + event.name + '\n' + await this.findUserReg(event.days, userId)
 
             if(toData){
                 if(toData[1] === 'to_mounth'){
-                    console.log('to_mounth')
+                    // console.log('to_mounth')
                     const res = await event.getKeyboardEventMounth(toData[2])
-                    screen.text = screen.text + `\n\n⏰ ` + res.text
+                    screen.text = screen.text + ticketPik + res.text
                     eventKeyboard = res.keyboard
                 }
                 else if(toData[1] === 'to_days'){
-                    console.log('to_days')
+                    // console.log('to_days')
                     const res = await event.getKeyboardEventDays(toData[2], toData[3])
-                    screen.text = screen.text + `\n\n⏰ ` + res.text
+                    screen.text = screen.text + ticketPik + res.text
                     eventKeyboard = res.keyboard 
                 }
                 else if(toData[1] === 'to_slots'){
-                    console.log('to_slots')
+                    // console.log('to_slots')
                     const res = await event.getKeyboardEventSlots(toData[2], toData[3], toData[4])
-                    screen.text = screen.text + `\n\n⏰ ` + res.text
+                    screen.text = screen.text + ticketPik + res.text
                     eventKeyboard = res.keyboard 
                 }
                 else if(toData[1] === 'prereg'){
-                    console.log('prereg')
+                    // console.log('prereg')
                     const res = await event.getKeyboardEventPreReg(toData[2], toData[3], toData[4], toData[5], userId)
-                    screen.text = screen.text + `\n\n⏰ ` + res.text
+                    screen.text = screen.text + ticketPik + res.text
                     eventKeyboard = res.keyboard 
                 }
                 else if(toData[1] === 'reg'){
-                    console.log('reg')
+                    // console.log('reg')
                     const userInfo = (await this.bot.telegram.getChatMember(userId, userId)).user
                     const res = await event.regEvent(toData[2], toData[3], toData[4], toData[5], userId, userInfo)
-                    screen.text = screen.text + `\n\n⏰ ` + res.text
+                    screen.text = screen.text + ticketPik + res.text
                     eventKeyboard = res.keyboard
                     SocketApt.socket.emit('updateEventInfo', {botId: this._id, token: process.env.SERVER_TOKEN, idEvent: event.idEvent})
                 }
-                // else if(toData[1] === 'donereg'){
-                //     console.log('donereg')
-                //     eventKeyboard = await event.doneRegEvent(toData[2], toData[3], toData[4], toData[5]) 
-                // }
-                // else if(toData[1] === 'falsereg'){
-                //     console.log('falsereg')
-                //     eventKeyboard = await event.falseRegEvent(toData[2], toData[3], toData[4], toData[5]) 
-                // }
                 else{
-                    console.log('to_years')
+                    // console.log('to_years')
                     const res = await event.getKeyboardEventYears()
-                    screen.text = screen.text + `\n\n⏰ ` + res.text
                     eventKeyboard = res.keyboard
                     if(eventKeyboard.length === 1 && eventKeyboard[0][0].to !== 'zero'){
                         const res = await event.getKeyboardEventMounth(eventKeyboard[0][0].text)
-                        screen.text = screen.text + `\n\n⏰ ` + res.text
                         eventKeyboard = res.keyboard
+                        if(!(eventKeyboard.length === 2 && eventKeyboard[1][0].to !== 'zero')) screen.text = screen.text + ticketPik + res.text
                         if(eventKeyboard.length === 2 && eventKeyboard[1][0].to !== 'zero'){
                             const link = eventKeyboard[1][0].to.split('|')
                             const res = await event.getKeyboardEventDays(link[2], link[3])
-                            screen.text = screen.text + `\n\n⏰ ` + res.text
                             eventKeyboard = res.keyboard
+                            if(!(eventKeyboard.length === 2 && eventKeyboard[1][0].to !== 'zero')) screen.text = screen.text + ticketPik + res.text
                             if(eventKeyboard.length === 2 && eventKeyboard[1][0].to !== 'zero'){
                                 const link = eventKeyboard[1][0].to.split('|')
                                 const res =  await event.getKeyboardEventSlots(link[2], link[3], link[4])
-                                screen.text = screen.text + `\n\n⏰ ` + res.text
+                                screen.text = screen.text + ticketPik + res.text
                                 eventKeyboard = res.keyboard
                             }
                         }
@@ -132,7 +120,7 @@ export class BotClass {
             }
             else{
                 const res =  await event.getKeyboardEventYears()
-                screen.text = screen.text + `\n\n⏰ ` + res.text
+                screen.text = screen.text + `\n\n` + ticketPik + res.text
                 eventKeyboard = res.keyboard
             }
         }

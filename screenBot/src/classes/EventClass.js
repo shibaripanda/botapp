@@ -24,7 +24,7 @@ export class EventClass {
             .map(item => item.slots)
             .flat()
             .reduce((acc, item) => acc + item.maxClients - item.clients.length, 0)
-            console.log('days', days)
+            // console.log('days', days)
             if(days > 0){
                 keyboardsYears.push([{text: i, to: `${this.sceenId}|to_mounth|${i}`, action: 'callback'}])
             }
