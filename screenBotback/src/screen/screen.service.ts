@@ -87,7 +87,7 @@ export class ScreenService {
                 await this.screenMongo.create({
                 owner: botId, 
                 name: screenName,
-                text: '',
+                text: event.name,
                 media: [],
                 document: [],
                 audio: [],

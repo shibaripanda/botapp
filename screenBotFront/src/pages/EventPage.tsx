@@ -109,7 +109,9 @@ export function EventPage(){
   const func = {
     createEvent: async () => pipSendSocket('createEvent', {botId: bot._id, event: newEventModule}),
     deleteEvent: async (event) => pipSendSocket('deleteEvent', {botId: bot._id, event: event}),
-    updateEvent: async (event, newEvent) => pipSendSocket('updateEvent', {botId: bot._id, event: event, newEvent: newEvent})
+    updateEvent: async (event, newEvent) => pipSendSocket('updateEvent', {botId: bot._id, event: event, newEvent: newEvent}),
+    createNamedGroup: async (group, groupName) => pipSendSocket('createNamedGroup', {botId: bot._id, group: group, groupName: groupName}),
+    sendTextToUser: async (text, userId) => pipSendSocket('sendTextToUser', {botId: botId, text: text, to: userId})
   }
 
   if(bot && status && text && leng){
@@ -178,6 +180,8 @@ export function EventPage(){
               oneEvent={item} 
               deleteEvent={func.deleteEvent}
               botId={botId}
+              createNamedGroup={func.createNamedGroup}
+              sendTextToUser={func.sendTextToUser}
             />
             </Grid.Col>)}
         </Grid>

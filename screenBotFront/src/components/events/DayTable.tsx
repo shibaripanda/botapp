@@ -1,11 +1,22 @@
-import React from 'react'
-import { Button, Grid, Table } from '@mantine/core'
+import React, { useMemo } from 'react'
+import { Button, Grid, Group, Table } from '@mantine/core'
 import { UserAction } from './UserAction.tsx'
 
 
-export function DayTable({day, deleteUserRegistration, indexDay}) {
+export function DayTable({sendTextToUser, text, leng, eventName, createNamedGroup, checked, day, deleteUserRegistration, indexDay}) {
 
-  const rows = day.slots.map((slot, index1) => {
+  const slotsFilter = useMemo(() => {
+    // if(event){
+      if(!checked){
+        return day.slots
+      }
+      return day.slots.filter(item => item.clients.length)
+    // }
+    
+    }, [day.slots, checked]
+  )
+
+  const rows = slotsFilter.map((slot, index1) => {
 
     return (
       <Table.Tr key={index1}>
@@ -16,11 +27,36 @@ export function DayTable({day, deleteUserRegistration, indexDay}) {
             {slot.clients.length} / {slot.maxClients}  
         </Table.Td>
         <Table.Td>
-            <Grid>{slot.clients.map((item, index) => <Grid.Col key={index} span={2.5}><UserAction key={index} user={item} indexDay={indexDay} indexSlot={index1} deleteUserRegistration={deleteUserRegistration}/></Grid.Col>)}</Grid>
+            <Grid>{slot.clients.map((item, index) => <Grid.Col key={index} span={2.5}><UserAction sendTextToUser={sendTextToUser} text={text} leng={leng} key={index} user={item} indexDay={indexDay} indexSlot={index1} deleteUserRegistration={deleteUserRegistration}/></Grid.Col>)}</Grid>
         </Table.Td>
       </Table.Tr>
     )
   })
+
+  const activesForClients = () => {
+    if(day.slots.reduce((acc, item) => acc + item.clients.length, 0) === 0){
+      return (
+        <div>Clients</div>
+      )
+    }
+    return (
+      <Group>
+        <Button variant={'default'} size="xs" 
+          onClick={() => {
+            const time = new Date(day.day).getDate() + '.' + (new Date(day.day).getMonth() + 1) + '.' + new Date(day.day).getFullYear()
+            createNamedGroup([...new Set(day.slots.filter(item => item.clients.length).map(item => item.clients).flat().map(item => item.user))], eventName + ' ' + time)
+          }}
+        >
+          Создать / Обновить группу
+        </Button>
+        <Button variant={'default'} size="xs">
+          Сообщение всем
+        </Button>
+        {/* <ModalSendMessageEvent text1={text} leng={leng} userId={}, username, activ, user, sendTextToUser/> */}
+      </Group>
+    )
+    
+  }
 
   return (
     <Table.ScrollContainer minWidth={800}>
@@ -29,8 +65,7 @@ export function DayTable({day, deleteUserRegistration, indexDay}) {
           <Table.Tr>
             <Table.Th>{new Date(day.day).getDate() + '.' + (new Date(day.day).getMonth() + 1) + '.' + new Date(day.day).getFullYear()}</Table.Th>
             <Table.Th>Clients: {day.slots.reduce((acc, item) => acc + item.clients.length, 0)} / {day.slots.reduce((acc, item) => acc + item.maxClients, 0)}</Table.Th>
-            <Table.Th>Clients <Button variant={'default'} 
-            size="xs">Создать группу</Button></Table.Th>
+            <Table.Th>{activesForClients()}</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>

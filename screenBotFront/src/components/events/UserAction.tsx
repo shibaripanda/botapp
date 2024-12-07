@@ -1,7 +1,21 @@
 import { Menu, Button, Anchor, Text } from '@mantine/core';
-import React, { useState } from 'react'
+import React, { forwardRef, useState } from 'react'
+import { ModalSendMessageEvent } from './ModalSendMessageEvent.tsx';
 
-export function UserAction({user, indexDay, indexSlot, deleteUserRegistration}) {
+// const MyComponent = forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>((props, ref) => (
+//       <ModalSendMessageEvent {...props} ref={ref}/>
+//   ))
+
+  const CorrectItem = forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<'button'>
+    >((props, ref) => (
+        <ModalSendMessageEvent type='button' {...props} ref={ref}/>
+    ))
+
+export function UserAction({sendTextToUser, text, leng, user, indexDay, indexSlot, deleteUserRegistration}) {
+
+    
 
     const [opened, setOpened] = useState(false)
 
@@ -37,10 +51,13 @@ export function UserAction({user, indexDay, indexSlot, deleteUserRegistration}) 
 
     const botMessage = (user) => {
         return (
-            <Menu.Item key={2}>
-                <Anchor size='sm' onClick={() => {
-                    console.log('bot message ' + user.user)
-                }}>Message via bot</Anchor>
+            // <Menu.Item key={2}>
+            //     <Anchor size='sm' onClick={() => {
+            //         console.log('bot message ' + user.user)
+            //     }}>Message via bot</Anchor>
+            // </Menu.Item>
+            <Menu.Item key={2} component={CorrectItem} >
+                {/* <MyComponent text1={text} leng={leng} userId={user.user} username={user.userInfo.username} sendTextToUser={sendTextToUser}/> */}
             </Menu.Item>
         )
     }

@@ -105,6 +105,24 @@ export class BotService {
             return bot.groups
         }
 
+        async createNamedGroup(id: number, botId: string, group: [], groupName: string){
+            const test = (await this.botMongo.findOne({owner: id, _id: botId}, {groups: 1})).groups.find(item => item['name'] === groupName)
+            if(test){
+                const bot = await this.botMongo.findOneAndUpdate(
+                    {owner: id, _id: botId},
+                    {$set: {'groups.$[el]': {name: groupName, group: group}}},
+                    {arrayFilters: [{ 'el.name': groupName }], new: true, returnDocument: 'after'})
+                return bot.groups
+            }
+            else{
+                const bot = await this.botMongo.findOneAndUpdate(
+                    {owner: id, _id: botId},
+                    {$addToSet: {groups: {name: groupName, group: group}}},
+                    {returnDocument: "after"})
+                return bot.groups
+            } 
+        }
+
         async renameMeContent(id: number, botId: string, content: any, newName: string){
             const bot = await this.botMongo.findOneAndUpdate({owner: id, _id: botId},
                 {$set: {'content.$[el].tx': newName}},

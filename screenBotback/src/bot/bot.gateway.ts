@@ -132,6 +132,14 @@ export class BotGateway {
   }
 
   @UseGuards(JwtAuthGuard)
+  @SubscribeMessage('createNamedGroup')
+  async createNamedGroup(client: Socket, payload: any): Promise<void> {
+    const user = client['user']
+    const res = await this.botSevice.createNamedGroup(user.id, payload.botId, payload.group, payload.groupName)
+    this.server.to(client.id).emit('getGroups', res)
+  }
+
+  @UseGuards(JwtAuthGuard)
   @SubscribeMessage('getContent')
   async getContent(client: Socket, payload: any): Promise<void> {
     const user = client['user']

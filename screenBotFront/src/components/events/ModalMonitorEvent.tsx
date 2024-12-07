@@ -22,7 +22,7 @@ interface Slots {
   clients: []
 }
 
-export function ModalMonitorEvent({text, leng, oneEvent, botId}) {
+export function ModalMonitorEvent({sendTextToUser, createNamedGroup, text, leng, oneEvent, botId}) {
 
   const [opened, { open, close }] = useDisclosure(false)
   const [event, setEvent] = useState<EventUse | false>(false)
@@ -87,7 +87,7 @@ export function ModalMonitorEvent({text, leng, oneEvent, botId}) {
             title={topLine()}
           >
             <>
-            {slotsFilter.map((item, index) => <DayTable key={index} day={item} deleteUserRegistration={deleteUserRegistration} indexDay={index}/>)}
+            {slotsFilter.map((item, index) => <DayTable sendTextToUser={sendTextToUser} text={text} leng={leng} eventName={event.name} createNamedGroup={createNamedGroup} checked={checked} key={index} day={item} deleteUserRegistration={deleteUserRegistration} indexDay={index}/>)}
 
             </>
           </Modal>
