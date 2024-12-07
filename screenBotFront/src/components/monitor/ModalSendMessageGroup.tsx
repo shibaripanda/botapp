@@ -7,6 +7,7 @@ export function ModalSendMessageGroup({text1, leng, selectedRows, content, scree
   const [opened, { open, close }] = useDisclosure(false)
   const [screen, setScreen] = useState<ComboboxItem | null>(null)
   const [text, setText] = useState('')
+  const [resalt, setResalt] = useState('')
   // const [visible, { toggle, off = close }] = useDisclosure(false)
   const [visible, setVisible] = useState(false)
 
@@ -32,8 +33,11 @@ export function ModalSendMessageGroup({text1, leng, selectedRows, content, scree
     <>
     
       <Modal size={'xl'} opened={opened} 
-        onClose={close} 
-        title={`${text1.mesToSelect[leng]} (${selectedRows.length})`}
+        onClose={() => {
+          setResalt('')
+          close()
+        }} 
+        title={`${text1.mesToSelect[leng]} (${selectedRows.length}) ${resalt}`}
       >
        <Box pos="relative">
         <LoadingOverlay visible={visible} loaderProps={{ children: text1.sendWait[leng] }} /> 
@@ -58,6 +62,7 @@ export function ModalSendMessageGroup({text1, leng, selectedRows, content, scree
           style={{marginTop: '1.5vmax'}}
           disabled={!screen}
           onClick={() => {
+            setResalt('✉️')
             const res = screens.find(item => item._id === screen?.value)
             if(res){
               setVisible(true)
@@ -73,6 +78,7 @@ export function ModalSendMessageGroup({text1, leng, selectedRows, content, scree
                   time = time + 100
                 } 
               }
+              setResalt('✅')
             }
             else if(screen?.value.substring(0, 7) === 'content'){
               setVisible(true)
@@ -88,6 +94,7 @@ export function ModalSendMessageGroup({text1, leng, selectedRows, content, scree
                   time = time + 100
                 } 
               }
+              setResalt('✅')
             }
             setScreen(null)
         }}>
@@ -104,6 +111,7 @@ export function ModalSendMessageGroup({text1, leng, selectedRows, content, scree
           style={{marginTop: '1.5vmax'}}
           disabled={textButDis(text)}
           onClick={() => {
+            setResalt('✉️')
             setVisible(true)
             let time = 0
             const timeLoad = selectedRows.length * 100
@@ -119,6 +127,7 @@ export function ModalSendMessageGroup({text1, leng, selectedRows, content, scree
                 time = time + 100
               } 
             }
+            setResalt('✅')
             setText('')
           }}>
           {text1.sendText[leng]}

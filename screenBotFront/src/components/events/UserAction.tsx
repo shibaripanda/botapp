@@ -1,27 +1,15 @@
-import { Menu, Button, Anchor, Text } from '@mantine/core';
-import React, { forwardRef, useState } from 'react'
-import { ModalSendMessageEvent } from './ModalSendMessageEvent.tsx';
-
-// const MyComponent = forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>((props, ref) => (
-//       <ModalSendMessageEvent {...props} ref={ref}/>
-//   ))
-
-  const CorrectItem = forwardRef<
-  HTMLButtonElement,
-  React.ComponentPropsWithoutRef<'button'>
-    >((props, ref) => (
-        <ModalSendMessageEvent type='button' {...props} ref={ref}/>
-    ))
+import { Menu, Button, Anchor, Text } from '@mantine/core'
+import React, { useState } from 'react'
+import { useDisclosure } from '@mantine/hooks'
+import { ModalSendMessageEvent } from './ModalSendMessageEvent.tsx'
 
 export function UserAction({sendTextToUser, text, leng, user, indexDay, indexSlot, deleteUserRegistration}) {
 
-    
-
     const [opened, setOpened] = useState(false)
-
+    const [openedModal, { open, close }] = useDisclosure(false)
+    
     const userInfo = (user) => {
         if(user.userInfo){
-          console.log(user.userInfo)
           if(user.userInfo.username){
             
             if(user.userInfo.first_name){
@@ -48,20 +36,15 @@ export function UserAction({sendTextToUser, text, leng, user, indexDay, indexSlo
             )
         } 
     }
-
-    const botMessage = (user) => {
+    const botMessage = () => {
         return (
-            // <Menu.Item key={2}>
-            //     <Anchor size='sm' onClick={() => {
-            //         console.log('bot message ' + user.user)
-            //     }}>Message via bot</Anchor>
-            // </Menu.Item>
-            <Menu.Item key={2} component={CorrectItem} >
-                {/* <MyComponent text1={text} leng={leng} userId={user.user} username={user.userInfo.username} sendTextToUser={sendTextToUser}/> */}
+            <Menu.Item key={2} onClick={() => open()}>
+                <Anchor size='sm'>
+                    {text.sendMes[leng]}
+                </Anchor>
             </Menu.Item>
         )
     }
-
     const deleteRegistration = (user) => {
         return (
             <Menu.Item key={3}>
@@ -74,16 +57,27 @@ export function UserAction({sendTextToUser, text, leng, user, indexDay, indexSlo
         )
     }
 
-  return (
-    <Menu shadow="md" width={200} opened={opened} onChange={setOpened} withArrow>
-        <Menu.Target>
-            <Button variant="default" size="xs" fullWidth>
-                {userInfo(user)}
-            </Button>
-        </Menu.Target>
-        <Menu.Dropdown>
-            {[directMessage(user), botMessage(user), deleteRegistration(user)]}
-        </Menu.Dropdown>
-    </Menu>
-  )
+    return (
+        <>
+            <Menu shadow="md" width={200} opened={opened} onChange={setOpened} withArrow>
+                <Menu.Target>
+                    <Button variant="default" size="xs" fullWidth>
+                        {userInfo(user)}
+                    </Button>
+                </Menu.Target>
+                <Menu.Dropdown>
+                    {[directMessage(user), botMessage(), deleteRegistration(user)]}
+                </Menu.Dropdown>
+            </Menu>
+            <ModalSendMessageEvent 
+                text1={text} 
+                leng={leng} 
+                userId={user.user} 
+                username={userInfo(user)} 
+                sendTextToUser={sendTextToUser} 
+                opened={openedModal}
+                close={close}
+            />
+        </>
+    )
 }

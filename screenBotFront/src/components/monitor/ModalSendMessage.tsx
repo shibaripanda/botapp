@@ -7,6 +7,7 @@ export function ModalSendMessage({text1, leng, content, userId, username, screen
   const [opened, { open, close }] = useDisclosure(false)
   const [screen, setScreen] = useState<ComboboxItem | null>(null)
   const [text, setText] = useState('')
+  const [resalt, setResalt] = useState('')
 
   const textButDis = (text) => {
     if(text){
@@ -26,8 +27,11 @@ export function ModalSendMessage({text1, leng, content, userId, username, screen
   return (
     <>
       <Modal size={'xl'} opened={opened} 
-        onClose={close} 
-        title={`${text1.message[leng]} to @${username}`}
+        onClose={() => {
+          setResalt('')
+          close()
+        }} 
+        title={`${text1.message[leng]} to @${username} ${resalt}`}
       >
         <Select
           clearable
@@ -47,13 +51,15 @@ export function ModalSendMessage({text1, leng, content, userId, username, screen
           style={{marginTop: '1.5vmax'}}
           disabled={!screen}
           onClick={() => {
+            setResalt('✉️')
             const res = screens.find(item => item._id === screen?.value)
             if(res){
               sendScreenToUser(res._id, userId)
-              
+              setResalt('✅')
             }
             else if(screen?.value.substring(0, 7) === 'content'){
               sendContentToUser(content[Number(screen.value.split('_')[1])], userId)
+              setResalt('✅')
             }
             setScreen(null)
         }}>
@@ -71,7 +77,9 @@ export function ModalSendMessage({text1, leng, content, userId, username, screen
           style={{marginTop: '1.5vmax'}}
           disabled={textButDis(text)}
           onClick={() => {
+            setResalt('✉️')
             sendTextToUser(text, userId)
+            setResalt('✅')
             setText('')
           }}>
           {text1.sendText[leng]}

@@ -1,17 +1,19 @@
 import React, { useMemo } from 'react'
 import { Button, Grid, Group, Table } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import { UserAction } from './UserAction.tsx'
+import { ModalSendMessageGroupEvent } from './ModalSendMessageGroupEvent.tsx'
 
 
 export function DayTable({sendTextToUser, text, leng, eventName, createNamedGroup, checked, day, deleteUserRegistration, indexDay}) {
 
+  const [openedModal, { open, close }] = useDisclosure(false)
+
   const slotsFilter = useMemo(() => {
-    // if(event){
-      if(!checked){
-        return day.slots
-      }
-      return day.slots.filter(item => item.clients.length)
-    // }
+    if(!checked){
+      return day.slots
+    }
+    return day.slots.filter(item => item.clients.length)
     
     }, [day.slots, checked]
   )
@@ -49,27 +51,36 @@ export function DayTable({sendTextToUser, text, leng, eventName, createNamedGrou
         >
           Создать / Обновить группу
         </Button>
-        <Button variant={'default'} size="xs">
+        <Button variant={'default'} size="xs" onClick={open} disabled={[...new Set(day.slots.filter(item => item.clients.length).map(item => item.clients).flat().map(item => item.user))].length === 1}>
           Сообщение всем
         </Button>
-        {/* <ModalSendMessageEvent text1={text} leng={leng} userId={}, username, activ, user, sendTextToUser/> */}
       </Group>
     )
     
   }
 
   return (
-    <Table.ScrollContainer minWidth={800}>
-      <Table verticalSpacing="xs"  withTableBorder withRowBorders={false} striped withColumnBorders>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{new Date(day.day).getDate() + '.' + (new Date(day.day).getMonth() + 1) + '.' + new Date(day.day).getFullYear()}</Table.Th>
-            <Table.Th>Clients: {day.slots.reduce((acc, item) => acc + item.clients.length, 0)} / {day.slots.reduce((acc, item) => acc + item.maxClients, 0)}</Table.Th>
-            <Table.Th>{activesForClients()}</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
-      </Table>
-    </Table.ScrollContainer>
+    <>
+      <Table.ScrollContainer minWidth={800}>
+        <Table verticalSpacing="xs"  withTableBorder withRowBorders={false} striped withColumnBorders>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>{new Date(day.day).getDate() + '.' + (new Date(day.day).getMonth() + 1) + '.' + new Date(day.day).getFullYear()}</Table.Th>
+              <Table.Th>Clients: {day.slots.reduce((acc, item) => acc + item.clients.length, 0)} / {day.slots.reduce((acc, item) => acc + item.maxClients, 0)}</Table.Th>
+              <Table.Th>{activesForClients()}</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>{rows}</Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
+      <ModalSendMessageGroupEvent 
+        text1={text} 
+        leng={leng} 
+        users={[...new Set(day.slots.filter(item => item.clients.length).map(item => item.clients).flat().map(item => item.user))]}
+        sendTextToUser={sendTextToUser} 
+        opened={openedModal} 
+        close={close}
+        />
+    </>
   )
 }

@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { Modal, Button, Textarea, Text } from '@mantine/core'
 
-export function ModalSendMessageEvent({text1, leng, userId, username, sendTextToUser, opened, close}) {
+export function ModalSendMessageGroupEvent({text1, leng, users, sendTextToUser, opened, close}) {
 
   const [text, setText] = useState('')
   const [resalt, setResalt] = useState('')
+  // const [visible, setVisible] = useState(false)
 
   const textButDis = (text) => {
     if(text){
@@ -26,16 +27,10 @@ export function ModalSendMessageEvent({text1, leng, userId, username, sendTextTo
         onClose={() => {
           setResalt('')
           close()
-        }} 
-        title={`${text1.message[leng]} to @${username} ${resalt}`}
-        overlayProps={{
-          backgroundOpacity: 0.55,
-          blur: 3,
         }}
+        title={`${text1.mesToSelect[leng]} (${users.length}) ${resalt}`}
       >
-        <Textarea
-          data-autofocus
-          autosize
+        <Textarea autosize
           minRows={2}
           style={{marginTop: '3vmax'}}
           description={textLength(text)}
@@ -45,9 +40,12 @@ export function ModalSendMessageEvent({text1, leng, userId, username, sendTextTo
         <Button variant="default" size="xs"
           style={{marginTop: '1.5vmax'}}
           disabled={textButDis(text)}
-          onClick={() => {
+          onClick={async () => {
             setResalt('✉️')
-            sendTextToUser(text, userId)
+            let time = 0
+            for(let i of users){
+              setTimeout(await sendTextToUser(text, i), time)
+            }
             setResalt('✅')
             setText('')
           }}>
