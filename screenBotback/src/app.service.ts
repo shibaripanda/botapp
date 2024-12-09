@@ -14,10 +14,13 @@ export class AppService {
 
     async onApplicationBootstrap() {
       await this.updateAppText()
+    //   const app = await this.appMongo.findOne({mainServerAppSettings: 'mainServerAppSettings'}, {text: 1, _id: 0})
+    // console.log(app.text)
     }
 
   async getText(): Promise<NewLengPack>{
     const app = await this.appMongo.findOne({mainServerAppSettings: 'mainServerAppSettings'}, {text: 1, _id: 0})
+    console.log(app.text)
     return app.text
   }
 
