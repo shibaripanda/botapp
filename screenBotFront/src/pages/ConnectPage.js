@@ -27,8 +27,13 @@ export function ConnectPage() {
     const avLengs = await axios({
       method: 'GET',
       url: `${process.env.REACT_APP_SERVERLINK}/app/avleng`,
-      timeout: 10000
+      timeout: 50000
+    }).then((res) => {
+      console.log(res.data)
+    }).catch((er) => {
+      console.log(er)
     })
+    console.log(avLengs.data)
     window.avlengBotApp = avLengs.data
     setAvLeng(avLengs.data)
     if(!avLengs.data.map(item => item.index).includes(l)){

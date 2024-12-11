@@ -20,7 +20,7 @@ export class AppService {
 
   async getText(): Promise<NewLengPack>{
     const app = await this.appMongo.findOne({mainServerAppSettings: 'mainServerAppSettings'}, {text: 1, _id: 0})
-    console.log(app.text)
+    // console.log(app.text)
     return app.text
   }
 

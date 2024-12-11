@@ -13,6 +13,7 @@ export class AppController {
 
   @Get('/avleng')
   getAvleng(): any{
+    console.log('lengs')
     return lengs
   }
 
