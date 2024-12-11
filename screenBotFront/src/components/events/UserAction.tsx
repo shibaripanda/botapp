@@ -31,7 +31,7 @@ export function UserAction({sendTextToUser, text, leng, user, indexDay, indexSlo
             const link = `https://t.me/${user.userInfo.username}`
             return (
                 <Menu.Item key={1}>
-                    <Anchor size='sm' href={link} target="_blank">Open telegram dialogue</Anchor>
+                    <Anchor size='sm' href={link} target="_blank">{text.openTelegramDialog[leng]}</Anchor>
                 </Menu.Item>
             )
         } 
@@ -51,7 +51,7 @@ export function UserAction({sendTextToUser, text, leng, user, indexDay, indexSlo
                 <Anchor size='sm' onClick={() => {
                     deleteUserRegistration(indexDay, indexSlot, user)
                 }}>
-                    <Text c={'red'}>Cancel registration</Text>
+                    <Text c={'red'}>{text.cancelReg[leng]}</Text>
                 </Anchor>
             </Menu.Item>
         )

@@ -65,7 +65,7 @@ export function ModalMonitorEvent({sendTextToUser, createNamedGroup, text, leng,
           <div>{event.name}</div>
           <div>{countRegUsers(event.days)}</div>
           <Switch
-            label={'не пустые'}
+            label={text.onlyActivSlots[leng]}
             radius="lg"
             color='green'
             checked={checked}

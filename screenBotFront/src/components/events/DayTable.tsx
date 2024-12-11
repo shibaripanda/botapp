@@ -38,7 +38,7 @@ export function DayTable({sendTextToUser, text, leng, eventName, createNamedGrou
   const activesForClients = () => {
     if(day.slots.reduce((acc, item) => acc + item.clients.length, 0) === 0){
       return (
-        <div>Clients</div>
+        <div>{text.clients[leng]}</div>
       )
     }
     return (
@@ -49,10 +49,10 @@ export function DayTable({sendTextToUser, text, leng, eventName, createNamedGrou
             createNamedGroup([...new Set(day.slots.filter(item => item.clients.length).map(item => item.clients).flat().map(item => item.user))], eventName + ' ' + time)
           }}
         >
-          Создать / Обновить группу
+          {text.createOrRefGroup[leng]}
         </Button>
         <Button variant={'default'} size="xs" onClick={open} disabled={[...new Set(day.slots.filter(item => item.clients.length).map(item => item.clients).flat().map(item => item.user))].length === 1}>
-          Сообщение всем
+          {text.mesToAll[leng]}
         </Button>
       </Group>
     )
@@ -66,7 +66,7 @@ export function DayTable({sendTextToUser, text, leng, eventName, createNamedGrou
           <Table.Thead>
             <Table.Tr>
               <Table.Th>{new Date(day.day).getDate() + '.' + (new Date(day.day).getMonth() + 1) + '.' + new Date(day.day).getFullYear()}</Table.Th>
-              <Table.Th>Clients: {day.slots.reduce((acc, item) => acc + item.clients.length, 0)} / {day.slots.reduce((acc, item) => acc + item.maxClients, 0)}</Table.Th>
+              <Table.Th>{text.clients[leng]}: {day.slots.reduce((acc, item) => acc + item.clients.length, 0)} / {day.slots.reduce((acc, item) => acc + item.maxClients, 0)}</Table.Th>
               <Table.Th>{activesForClients()}</Table.Th>
             </Table.Tr>
           </Table.Thead>

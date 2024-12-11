@@ -105,7 +105,13 @@ export const textArray: LengData[] = [
     {rutext: 'Редактируется', index: 'editing', info_data: 'редактируется'},
     {rutext: 'Опубликовано', index: 'published', info_data: 'опубликовано'},
     {rutext: 'Используется', index: 'inuse', info_data: 'используется'},
-    // {rutext: 'Максимум клиентов', index: 'maxClients', info_data: 'максимум клиентов'},
+    {rutext: 'Создать или обновить группу', index: 'createOrRefGroup', info_data: 'согдать или обновить группу'},
+    {rutext: 'Сообщение для всех', index: 'mesToAll', info_data: 'сообщение для всех'},
+    {rutext: 'Клиенты', index: 'clients', info_data: 'клиенты'},
+    {rutext: 'Только активные', index: 'onlyActivSlots', info_data: 'только активные'},
+    {rutext: 'Открыть телеграм диалог', index: 'openTelegramDialog', info_data: 'открыть телеграм диалог'},
+    {rutext: 'Отменить регистрацию', index: 'cancelReg', info_data: 'отменить регистрацию'},
+    
     
 ]
 
