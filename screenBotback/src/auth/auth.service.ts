@@ -38,13 +38,15 @@ export class AuthService {
     }
     private async telegramAuth(data: ReqestAuthDto){
         const validator = new AuthDataValidator({ botToken: process.env.BOT_TOKEN })
-        let dataCheck: string = '/aut/login?'
+
+        let dataCheck: string = '/auth/login?'
         for (const key in data) {
             dataCheck = dataCheck + key + '=' + data[key] + '&'
         }
         const dataAuth = urlStrToAuthDataMap('http://localhost' + dataCheck)
         try{
             const user = await validator.validate(dataAuth)
+            console.log(user)
             return user
         }
         catch(error) {

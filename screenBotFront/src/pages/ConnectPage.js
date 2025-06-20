@@ -8,6 +8,7 @@ import { LanguagePicker } from '../components/LanguagePicker/LanguagePicker.tsx'
 export function ConnectPage() {
 
   console.log('Connect page')
+  console.log(process.env.REACT_APP_SERVERLINK)
 
   const [text, setText] = useState(window.textBotApp ? window.textBotApp: false)
   const [leng, setLeng] = useState(window.lengBotApp ? window.lengBotApp : false)
